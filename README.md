@@ -51,16 +51,18 @@ session = FacebookPy(username="abc",
 ### Table of Contents
 
 * [FacebookPy Available Features](#facebookpy-available-features)
-  * [Following](#following)  ✔
-  * [Following by a list](#following-by-a-list)  ✔
-  * [Follow someone else's followers](#follow-someone-elses-followers)  ✔
-  * [Follow the likers of posts of users](#follow-the-likers-of-photos-of-users)   ✔
-  * [Friending](#friending)  ✔
-  * [Friending by a list](#friending-by-a-list)  ✔
-  * [Restricting Likes](#restricting-likes)  ✔
-  * [Ignoring Users](#ignoring-users)  ✔
-  * [Excluding friends](#excluding-friends)  ✔
-  * [Quota Supervisor](#quota-supervisor)  ✔
+  * [Following](#following)
+  * [Following by a list](#following-by-a-list)
+  * [Follow someone else's followers](#follow-someone-elses-followers)
+  * [Follow the likers of posts of users](#follow-the-likers-of-photos-of-users)
+  * [Friending](#friending)
+  * [Friending by a list](#friending-by-a-list)
+  * [Restricting Likes](#restricting-likes)
+  * [Ignoring Users](#ignoring-users)
+  * [Excluding friends](#excluding-friends)
+  * [Confirm friends received](confirm-friends-received)
+  * [Add suggested friends](Add-suggested-friends)
+  * [Quota Supervisor](#quota-supervisor)
 
 <br />
 
@@ -176,6 +178,22 @@ session.set_dont_include(['friend1', 'friend2', 'friend3'])
 ### Follow/Unfollow/exclude not working?
 
 If you notice that one or more of the above functionalities are not working as expected - e.g. you have specified:
+
+```python
+session.set_do_follow(enabled=True, percentage=10, times=2)
+```
+
+### confirm friends received?
+
+Confirm all the friends requests recieved.
+
+    session.confirm_friends()
+
+### add suggested friends?
+
+From friends suggested by facebook add top few
+
+    session.add_suggested_friends()
 
 ```python
 session.set_do_follow(enabled=True, percentage=10, times=2)

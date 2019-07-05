@@ -11,8 +11,8 @@ import os
 # import csv
 # import json
 # import requests
-# from selenium import webdriver
-# from selenium.webdriver import DesiredCapabilities
+from selenium import webdriver
+from selenium.webdriver import DesiredCapabilities
 from pyvirtualdisplay import Display
 import logging
 from contextlib import contextmanager
@@ -44,7 +44,7 @@ from socialcommons.time_util import sleep
 # from socialcommons.time_util import set_sleep_percentage
 # from socialcommons.util import get_active_users
 from socialcommons.util import validate_userid
-# from socialcommons.util import web_address_navigator
+from socialcommons.util import web_address_navigator
 from socialcommons.util import interruption_handler
 from socialcommons.util import highlight_print
 # from socialcommons.util import dump_record_activity
@@ -78,6 +78,7 @@ from socialcommons.browser import close_browser
 from socialcommons.file_manager import get_workspace
 from socialcommons.file_manager import get_logfolder
 
+from selenium.webdriver.common.action_chains import ActionChains
 # import exceptions
 from selenium.common.exceptions import NoSuchElementException
 from socialcommons.exceptions import SocialPyError
@@ -1234,6 +1235,73 @@ class FacebookPy:
                         self.photo_comments)
 
         return comments
+
+    def confirm_friends(self, max_confirms=100, sleep_delay = 6):
+        self.browser.get("https://www.facebook.com/friends/requests/")
+        delay_random = random.randint(
+                    ceil(sleep_delay * 0.85),
+                    ceil(sleep_delay * 1.14))
+        confirms = 0
+        try:
+            rows = self.browser.find_elements_by_css_selector("div.ruResponseSectionContainer")
+            for i in range(0, len(rows)):
+                try:
+                    row_item = self.browser.find_elements_by_css_selector("div.ruResponseSectionContainer")[i]
+                    confirm_button = self.browser.find_elements_by_css_selector("div.ruResponseSectionContainer")[i].find_element_by_xpath("//div/div/div[2]/div/div/button[text()='Confirm']")
+                    self.logger.info("Confirm button found, confirming...")
+                    try:
+                        confirm_button.click()
+                        # self.browser.execute_script("var evt = document.createEvent('MouseEvents');" + "evt.initMouseEvent('click',true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0,null);" + "arguments[0].dispatchEvent(evt);", row_item.find_elements_by_css_selector("div.ruResponseSectionContainer")[i].find_element_by_xpath("//div/div/div[2]/div/div/button[text()='Confirm']"))
+                        # ActionChains(self.browser).move_to_element(confirm_button).perform()
+                        # ActionChains(self.browser).click().perform()
+                    except Exception as e:
+                        pass
+                    self.logger.info("Clicked {}".format(confirm_button.text))
+                    confirms += 1
+                    self.logger.info("Confirms sent in this iteration: {}".format(confirms))
+                    if confirms >= max_confirms:
+                        self.logger.info("max_confirms({}) for this iteration reached , Returning...".format(max_confirms))
+                        return
+                except Exception as e:
+                    self.logger.error(e)
+                sleep(delay_random)
+        except Exception as e:
+            self.logger.error(e)
+        return confirms
+
+    def add_suggested_friends(self, max_confirms=100, sleep_delay = 6):
+        self.browser.get("https://www.facebook.com/friends/requests/")
+        delay_random = random.randint(
+                    ceil(sleep_delay * 0.85),
+                    ceil(sleep_delay * 1.14))
+        adds = 0
+        try:
+            self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            rows = self.browser.find_elements_by_css_selector("div.FriendButton")
+            for i in range(0, len(rows)):
+                try:
+                    row_item = self.browser.find_elements_by_css_selector("div.FriendButton")[i]
+                    # last_height = self.browser.execute_script("return document.body.scrollHeight")
+                    confirm_button = row_item.find_element_by_xpath("//button[text()='Add Friend']")
+                    self.logger.info("Add Friend button found, adding...")
+                    try:
+                        confirm_button.click()
+                        # ActionChains(self.browser).move_to_element(confirm_button).perform()
+                        # ActionChains(self.browser).click().perform()
+                    except Exception as e:
+                        pass
+                    self.logger.info("Clicked {}".format(confirm_button.text))
+                    adds += 1
+                    self.logger.info("Add Friends sent in this iteration: {}".format(adds))
+                    if adds >= max_confirms:
+                        self.logger.info("max Add Friends ({}) for this iteration reached , Returning...".format(max_confirms))
+                        return
+                except Exception as e:
+                    self.logger.error(e)
+                sleep(delay_random)
+        except Exception as e:
+            self.logger.error(e)
+        return adds
 
     # def set_skip_users(self,
     #                    skip_private=True,

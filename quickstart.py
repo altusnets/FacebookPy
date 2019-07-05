@@ -59,4 +59,6 @@ with smart_run(session):
 
     session.follow_likers(random_targets, photos_grab_amount = 2, follow_likers_per_photo = 3, randomize=True, sleep_delay=600, interact=False)
     session.fetch_birthdays()
+    session.confirm_friends()
+    session.add_suggested_friends()
 
