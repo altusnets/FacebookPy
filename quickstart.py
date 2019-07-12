@@ -61,4 +61,4 @@ with smart_run(session):
     session.confirm_friends()
     session.add_suggested_friends()
     friendslist = session.get_recent_friends()
-    session.invite_friends_to_page(friendslist)
+    successfully_invited_friends = session.invite_friends_to_page(friendslist=friendslist, pagename="PickLively")

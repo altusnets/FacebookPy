@@ -238,7 +238,7 @@ def friend_restriction(operation, username, limit, logger):
             # close the open connection
             conn.close()
 
-def confirm_unfollow(browser):
+def confirm_unfriend(browser):
     """ Deal with the confirmation dialog boxes during an unfollow """
     attempt = 0
 
@@ -366,7 +366,7 @@ def verify_action(browser, action, track, username, person, person_id, logger,
 
                 if action == "unfollow":
                     sleep(4)  # TODO: use explicit wait here
-                    confirm_unfollow(browser)
+                    confirm_unfriend(browser)
 
                 button_change = explicit_wait(browser, "VOEL",
                                               [post_action_text, "XPath"],

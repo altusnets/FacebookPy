@@ -906,37 +906,60 @@ class FacebookPy:
         friend_elems = self.browser.find_elements_by_css_selector("ul > li > div > div > div.uiProfileBlockContent > div > div:nth-child(2) > div > a")
         friends = []
         for friend_elem  in friend_elems:
-            friends.append(friend_elem.get_attribute('href').split('?')[0].split('/')[3])
+            uid = friend_elem.get_attribute('href').split('?')[0].split('/')[3]
+            if uid == 'profile.php':
+                continue
+            friends.append(uid)
         return friends
 
-    def invite_friends_to_page(self, friendslist, sleep_delay=6):
+    def invite_friends_to_page(self, friendslist, pagename, sleep_delay=6):
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
+        successfully_invited_friends = []
         for friend in friendslist:
-            self.browser.get("https://www.facebook.com/{}".format(friend))
-            ellipse_elem = self.browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div > div > button > i")
-            # ellipse_elem.click()
-            ActionChains(self.browser).move_to_element(ellipse_elem).perform()
-            ActionChains(self.browser).click().perform()
-            sleep(delay_random)
-            retry_times = 0
-            while(retry_times < 10):
-                try:
-                    sleep(delay_random)
-                    dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/invite_to_page_option.png', grayscale=True, confidence=.9)
-                    self.logger.info("invite_to_page_option.png is Visible, lets click it")
-                    pyautogui.moveTo(dropx, dropy)
-                    sleep(delay_random)
-                    pyautogui.click()
-                    pyautogui.doubleClick()
-                    sleep(delay_random)
-                    self.logger.info("invite_to_page_option.png Clicked")
-                    break
-                except Exception as e:
-                    self.logger.info('invite_to_page_option.png is not yet visible. Error: {}'.format(e))
-                retry_times = retry_times + 1
-            #TODO:Remaining part
+            try:
+                self.logger.info("Visiting {}".format(friend))
+                self.browser.get("https://www.facebook.com/{}".format(friend))
+                ellipse_elem = self.browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div > div > button > i")
+                ActionChains(self.browser).move_to_element(ellipse_elem).perform()
+                ActionChains(self.browser).click().perform()
+                sleep(delay_random)
+                retry_times = 0
+                while(retry_times < 10):
+                    try:
+                        sleep(delay_random)
+                        dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/invite_to_page_option.png', grayscale=True, confidence=.9)
+                        self.logger.info("invite_to_page_option.png is Visible, lets click it")
+                        pyautogui.moveTo(dropx, dropy)
+                        sleep(delay_random)
+                        pyautogui.click()
+                        pyautogui.doubleClick()
+                        sleep(delay_random)
+                        self.logger.info("invite_to_page_option.png Clicked")
+                        break
+                    except Exception as e:
+                        self.logger.info('invite_to_page_option.png is not yet visible. Error: {}'.format(e))
+                    retry_times = retry_times + 1
+                sleep(delay_random)
+                rows = self.browser.find_elements_by_css_selector("div > div > div > div > div > div > div > div > div.uiScrollableArea > div.uiScrollableAreaWrap > div > div > ul > li > div > table > tbody > tr")
+                for row in rows:
+                    text_elem = row.find_element_by_css_selector("td:nth-child(2) > div.ellipsis > a > span")
+                    if text_elem.text!=pagename:
+                        continue
+                    button_elem = row.find_element_by_css_selector("td:nth-child(3) > button")
+                    if button_elem.text != 'Invited':
+                        self.logger.info('Already invited: {}'.format(friend))
+                        successfully_invited_friends.append(friend)
+                    else:
+                        ActionChains(self.browser).move_to_element(button_elem).perform()
+                        ActionChains(self.browser).click().perform()
+                        self.logger.info('Just invited: {}'.format(friend))
+                        successfully_invited_friends.append(friend)
+                        sleep(delay_random)
+            except Exception as e:
+                self.logger.info("Failed for friend {}".format(friend))
+        return successfully_invited_friends
 
     def interact_by_users(self,
                           usernames,
