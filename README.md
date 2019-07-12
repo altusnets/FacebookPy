@@ -57,6 +57,7 @@ session = FacebookPy(username="abc",
   * [Follow the likers of posts of users](#follow-the-likers-of-photos-of-users)
   * [Friending](#friending)
   * [Friending by a list](#friending-by-a-list)
+  * [UnFriending by a list](#unfriending-by-a-list)
   * [Restricting Likes](#restricting-likes)
   * [Ignoring Users](#ignoring-users)
   * [Excluding friends](#excluding-friends)
@@ -152,6 +153,14 @@ session.friend('user1', daysold=365, max_pic = 100, sleep_delay=600, interact=Fa
 
 ```python
 friend_by_list(friendlist=['samantha3', 'larry_ok'], times=1, sleep_delay=600, interact=False)
+```
+
+### UnFriending by a list
+
+##### This will unfriend each account from a list of facebook userids
+
+```python
+unfriend_by_list(friendlist=['samantha3', 'larry_ok'], sleep_delay=6)
 ```
 
 ### Restricting Likes

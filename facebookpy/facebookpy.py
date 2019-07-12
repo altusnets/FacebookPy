@@ -61,6 +61,7 @@ from .unfollow_util  import dump_follow_restriction
 # from .unfollow_util  import set_automated_followed_pool
 # from .unfollow_util  import get_follow_requests
 from .unfriend_util import friend_user
+from .unfriend_util import unfriend_user
 # from .commenters_util import extract_information
 from .commenters_util import users_liked
 from .commenters_util import get_post_urls_from_profile
@@ -605,6 +606,18 @@ class FacebookPy:
                                             self.blacklist,
                                             self.logger,
                                             self.logfolder)
+
+    def unfriend_by_list(self, friendlist, sleep_delay=6):
+        for acc_to_friend in friendlist:
+            friend_state, msg = unfriend_user(self.browser,
+                                            "profile",
+                                            self.username,
+                                            acc_to_friend,
+                                            None,
+                                            self.blacklist,
+                                            self.logger,
+                                            self.logfolder,
+                                            sleep_delay=sleep_delay)
 
     def follow_by_list(self, followlist, times=1, sleep_delay=600,
                        interact=False):

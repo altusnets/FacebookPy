@@ -1,5 +1,8 @@
 from datetime import datetime
 import sqlite3
+import time
+from math import ceil
+import random
 
 from socialcommons.time_util import sleep
 from socialcommons.util import update_activity
@@ -20,6 +23,11 @@ from socialcommons.quota_supervisor import quota_supervisor
 from .settings import Settings
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
+from selenium.webdriver.common.action_chains import ActionChains
+import pyautogui
+
+HOME = "/Users/ishandutta2007"
+CWD = HOME + "/Documents/Projects/FacebookPy"
 
 def verify_username_by_id(browser, username, person, person_id, logger,
                           logfolder):
@@ -176,6 +184,43 @@ def friend_user(browser, track, login, userid_to_friend, button, blacklist,
     # sleep(naply)
 
     return True, "success"
+
+def unfriend_user(browser, track, login, userid_to_friend, button, blacklist,
+                logger, logfolder, sleep_delay):
+    """ UnFriend a user either from the profile page or post page or dialog
+    box """
+    user_link = "https://www.facebook.com/{}/".format(userid_to_friend)
+    web_address_navigator( browser, user_link, Settings)
+    delay_random = random.randint(
+                ceil(sleep_delay * 0.85),
+                ceil(sleep_delay * 1.14))
+
+    friend_button_elem = browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
+    ActionChains(browser).move_to_element(friend_button_elem).perform()
+    ActionChains(browser).click().perform()
+
+    sleep(delay_random)
+    retry_times = 0
+    while(retry_times < 10):
+        try:
+            sleep(delay_random)
+            dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/unfriend.png', grayscale=True, confidence=.6)
+            logger.info("unfriend.png is Visible, lets click it")
+            pyautogui.moveTo(dropx, dropy)
+            sleep(delay_random)
+            pyautogui.click()
+            pyautogui.doubleClick()
+            sleep(delay_random)
+            logger.info("unfriend.png Clicked")
+            break
+        except Exception as e:
+            logger.info('unfriend.png is not yet visible. Error: {}'.format(e))
+        retry_times = retry_times + 1
+    sleep(delay_random)
+    if retry_times < 10:
+        return True, "success"
+    else:
+        return False, ""
 
 def friend_restriction(operation, username, limit, logger):
     """ Keep track of the friended users and help avoid excessive friend of
