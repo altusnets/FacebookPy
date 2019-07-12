@@ -36,7 +36,6 @@ with smart_run(session):
     # session.set_do_like(enabled=True, percentage=90)
     session.set_do_follow(enabled=True, percentage=40, times=1)
 
-
     """ Select users form a list of a predefined targets...
     """
 
@@ -61,4 +60,5 @@ with smart_run(session):
     session.fetch_birthdays()
     session.confirm_friends()
     session.add_suggested_friends()
-
+    friendslist = session.get_recent_friends()
+    session.invite_friends_to_page(friendslist)

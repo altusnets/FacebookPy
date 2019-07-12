@@ -63,6 +63,8 @@ session = FacebookPy(username="abc",
   * [Confirm friends received](confirm-friends-received)
   * [Add suggested friends](Add-suggested-friends)
   * [Quota Supervisor](#quota-supervisor)
+  * [Get recent friends](#get-recent-friends):
+  * [Invite friends to page](#invite-friends-to-page) 
 
 <br />
 
@@ -222,6 +224,18 @@ session = FacebookPy(username=facebook_username, password=facebook_password, byp
                       peak_follows=(48, None),
                       peak_unfollows=(35, 402),
                       peak_server_calls=(None, 4700))
+```
+
+### get recent friends
+
+```python
+  session.get_recent_friends()
+```
+
+### invite friends to page
+
+```python
+  session.invite_friends_to_page(friendslist=['samantha3', 'larry_ok'])
 ```
 
  

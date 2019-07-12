@@ -83,7 +83,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 from socialcommons.exceptions import SocialPyError
 from .settings import Settings
+import pyautogui
 
+HOME = "/Users/ishandutta2007"
+CWD = HOME + "/Documents/Projects/FacebookPy"
 
 class FacebookPy:
     """Class to be instantiated to use the script"""
@@ -897,6 +900,43 @@ class FacebookPy:
         except Exception as e:
             self.logger.error(e)
         return adds
+
+    def get_recent_friends(self):
+        self.browser.get("https://www.facebook.com/{}/friends_recent".format(self.userid))
+        friend_elems = self.browser.find_elements_by_css_selector("ul > li > div > div > div.uiProfileBlockContent > div > div:nth-child(2) > div > a")
+        friends = []
+        for friend_elem  in friend_elems:
+            friends.append(friend_elem.get_attribute('href').split('?')[0].split('/')[3])
+        return friends
+
+    def invite_friends_to_page(self, friendslist, sleep_delay=6):
+        delay_random = random.randint(
+                    ceil(sleep_delay * 0.85),
+                    ceil(sleep_delay * 1.14))
+        for friend in friendslist:
+            self.browser.get("https://www.facebook.com/{}".format(friend))
+            ellipse_elem = self.browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div > div > button > i")
+            # ellipse_elem.click()
+            ActionChains(self.browser).move_to_element(ellipse_elem).perform()
+            ActionChains(self.browser).click().perform()
+            sleep(delay_random)
+            retry_times = 0
+            while(retry_times < 10):
+                try:
+                    sleep(delay_random)
+                    dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/invite_to_page_option.png', grayscale=True, confidence=.9)
+                    self.logger.info("invite_to_page_option.png is Visible, lets click it")
+                    pyautogui.moveTo(dropx, dropy)
+                    sleep(delay_random)
+                    pyautogui.click()
+                    pyautogui.doubleClick()
+                    sleep(delay_random)
+                    self.logger.info("invite_to_page_option.png Clicked")
+                    break
+                except Exception as e:
+                    self.logger.info('invite_to_page_option.png is not yet visible. Error: {}'.format(e))
+                retry_times = retry_times + 1
+            #TODO:Remaining part
 
     def interact_by_users(self,
                           usernames,
