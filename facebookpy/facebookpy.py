@@ -190,6 +190,7 @@ class FacebookPy:
         self.already_Visited = 0
 
         self.follow_times = 1
+        self.friend_times = 1
         self.invite_times = 1
         self.do_follow = False
         self.follow_percentage = 0
@@ -605,17 +606,17 @@ class FacebookPy:
                                             "profile",
                                             self.username,
                                             acc_to_friend,
-                                            None,
+                                            self.friend_times,
                                             self.blacklist,
                                             self.logger,
                                             self.logfolder)
 
     def unfriend_by_list(self, friendlist, sleep_delay=6):
-        for acc_to_friend in friendlist:
+        for acc_to_unfriend in friendlist:
             friend_state, msg = unfriend_user(self.browser,
                                             "profile",
                                             self.username,
-                                            acc_to_friend,
+                                            acc_to_unfriend,
                                             None,
                                             self.blacklist,
                                             self.logger,
@@ -986,10 +987,43 @@ class FacebookPy:
             friends.append(uid)
         return friends
 
+    def withdraw_outgoing_friends_requests(self, sleep_delay=6):
+        delay_random = random.randint(
+                    ceil(sleep_delay * 0.85),
+                    ceil(sleep_delay * 1.14))
+        self.browser.get("https://www.facebook.com/friends/requests/?fcref=ft&outgoing=1")
+        sent_btns = self.browser.find_elements_by_css_selector("button.FriendRequestOutgoing.outgoingButton")
+        for btn in sent_btns:
+            try:
+                if 'hidden_elem' in btn.get_attribute('class'):
+                    continue
+                ActionChains(self.browser).move_to_element(btn).perform()
+                ActionChains(self.browser).click().perform()
+                self.logger.info("{} Clicked".format(btn.text))
+                sleep(delay_random)
+                retry_times = 0
+                while(retry_times < 10):
+                    try:
+                        sleep(delay_random)
+                        dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/cancel_request.png', grayscale=True, confidence=.7)
+                        self.logger.info("cancel_request.png is Visible, lets click it")
+                        pyautogui.moveTo(dropx, dropy)
+                        sleep(delay_random)
+                        pyautogui.click()
+                        pyautogui.doubleClick()
+                        sleep(delay_random*5)
+                        self.logger.info("cancel_request.png Clicked")
+                        break
+                    except Exception as e:
+                        self.logger.info('cancel_request.png is not yet visible. Error: {}'.format(e))
+                    retry_times = retry_times + 1
+            except Exception as e:
+                self.logger.error(e)
+
     def add_likers_of_page(self, page_likers_url, sleep_delay=6):
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
-                    ceil(sleep_delay * 1.14))        
+                    ceil(sleep_delay * 1.14))
         self.browser.get(page_likers_url)
         add_btns = self.browser.find_elements_by_css_selector("button.FriendRequestAdd.addButton")
 
@@ -1001,7 +1035,7 @@ class FacebookPy:
                     continue
                 ActionChains(self.browser).move_to_element(btn).perform()
                 ActionChains(self.browser).click().perform()
-                self.logger.info("Clicked")
+                self.logger.info("{} Clicked".format(btn.text))
                 sleep(delay_random)
             except Exception as e:
                 self.logger.error(e)

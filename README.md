@@ -67,6 +67,7 @@ session = FacebookPy(username="abc",
   * [Get recent friends](#get-recent-friends):
   * [Invite friends to page](#invite-friends-to-page) 
   * [Add likers of page](#add-likers-of-page)
+  * [Withdraw outgoing friends requests](#withdraw-outgoing-friends-requests)
 
 <br />
 
@@ -252,6 +253,13 @@ session = FacebookPy(username=facebook_username, password=facebook_password, byp
 
 ```python
      session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/101771478880/likers?f=AbqfdHqQ9CNUi3xZPT6BlmnyGrDaZjR95UkZkJMjMQIlPUvwblytgVaUg69FjTdlHnRayhaftiKR9pPMZ5tkczTQbHbWWq-2nOCQ-qvVMC8IOw")
+```
+
+
+### withdraw outgoing friends requests
+
+```python
+    session.withdraw_outgoing_friends_requests()
 ```
 
 ## How to run:

@@ -113,7 +113,7 @@ def get_friending_status(browser, track, username, person, person_id, logger,
     return friending_status, friend_button
 
 
-def friend_user(browser, track, login, userid_to_friend, button, blacklist,
+def friend_user(browser, track, login, userid_to_friend, times, blacklist,
                 logger, logfolder):
     """ Friend a user either from the profile page or post page or dialog
     box """
@@ -127,6 +127,9 @@ def friend_user(browser, track, login, userid_to_friend, button, blacklist,
     # page, then do not navigate to it again
     user_link = "https://www.facebook.com/{}/".format(userid_to_friend)
     web_address_navigator( browser, user_link, Settings)
+    if friend_restriction("read", userid_to_friend, 1, logger):
+        logger.info("Already connected {} or more times".format(times))
+        return
 
     # find out CURRENT friending status
     friending_status, friend_button = \
@@ -185,11 +188,11 @@ def friend_user(browser, track, login, userid_to_friend, button, blacklist,
 
     return True, "success"
 
-def unfriend_user(browser, track, login, userid_to_friend, button, blacklist,
+def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
                 logger, logfolder, sleep_delay):
     """ UnFriend a user either from the profile page or post page or dialog
     box """
-    user_link = "https://www.facebook.com/{}/".format(userid_to_friend)
+    user_link = "https://www.facebook.com/{}/".format(userid_to_unfriend)
     web_address_navigator( browser, user_link, Settings)
     delay_random = random.randint(
                 ceil(sleep_delay * 0.85),
@@ -212,6 +215,7 @@ def unfriend_user(browser, track, login, userid_to_friend, button, blacklist,
             pyautogui.doubleClick()
             sleep(delay_random)
             logger.info("unfriend.png Clicked")
+            friend_restriction("write", userid_to_unfriend, None, logger)
             break
         except Exception as e:
             logger.info('unfriend.png is not yet visible. Error: {}'.format(e))

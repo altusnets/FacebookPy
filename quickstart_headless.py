@@ -61,4 +61,8 @@ with smart_run(session):
     # session.confirm_friends()
     # session.add_suggested_friends()
     session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/101771478880/likers?f=AbqfdHqQ9CNUi3xZPT6BlmnyGrDaZjR95UkZkJMjMQIlPUvwblytgVaUg69FjTdlHnRayhaftiKR9pPMZ5tkczTQbHbWWq-2nOCQ-qvVMC8IOw")
+    session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/396185197414302/likers?f=Abr2VwU_kVVCXkwXPkbFfo5QA6ox7BqvKuYrW4-7EWS0b5Y61Y6gq3sCsC8zpAnZ1cxTfYD2IN38YJNRx5WY0lwG0tpwSLkhefV1l2_DnnKZVA")
+    session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/1600562606933560/likers?f=AbpMXTubybrIpSgniVJL1ec2qzhJSC7nQcNm1hASbLwweGWRhGd1Kf7iTZ6eLkeBaQ25mzzuBAtRVHEzCFJFa6mNHlYErYW1Cq60kwSLCRrDag")
+    session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/1294302220678964/likers?f=AbrmGJINmsaOpOTe2Bu8Hys68kZpJ_S5IWSiw7s5kMQ7K0qAzUAVLFZV7IieErNlc34bADViG3KFbs6KMTGcYqCWg1MnF6X1nkWG1uEiLxDzDA")
+    session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/1164458926994976/likers?f=AboHFE1rZyA9tE6ykLZBMTtDtpiFvMuhEjcuZDkOYD-GtaUI_PuMgr9yuAR7yFLU4hByI0vp_2W8GqBY1LtkDlGc73nIhzUjCNVbChBxyf8uPw&ref=snippets")
 
