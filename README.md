@@ -58,6 +58,7 @@ session = FacebookPy(username="abc",
   * [Friending](#friending)
   * [Friending by a list](#friending-by-a-list)
   * [UnFriending by a list](#unfriending-by-a-list)
+  * [UnFriending by url list](#unfriending-by-url-list)
   * [Restricting Likes](#restricting-likes)
   * [Ignoring Users](#ignoring-users)
   * [Excluding friends](#excluding-friends)
@@ -163,6 +164,14 @@ friend_by_list(friendlist=['samantha3', 'larry_ok'], times=1, sleep_delay=600, i
 
 ```python
 unfriend_by_list(friendlist=['samantha3', 'larry_ok'], sleep_delay=6)
+```
+
+### UnFriending by url list
+
+##### This will unfriend each account from a list of facebook profile full urls
+
+```python
+unfriend_by_urllist(urllist=["facebook.com/profile.php?id=100023983575804&fref=pb&hc_location=friends_tab", "https://www.facebook.com/profile.php?id=100021936281017&fref=pb&hc_location=friends_tab"])
 ```
 
 ### Restricting Likes

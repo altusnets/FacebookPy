@@ -623,6 +623,18 @@ class FacebookPy:
                                             self.logfolder,
                                             sleep_delay=sleep_delay)
 
+    def unfriend_by_urllist(self, urllist, sleep_delay=6):
+        for url in urllist:
+            friend_state, msg = unfriend_user_by_url(self.browser,
+                                            "profile",
+                                            self.username,
+                                            url,
+                                            None,
+                                            self.blacklist,
+                                            self.logger,
+                                            self.logfolder,
+                                            sleep_delay=sleep_delay)
+
     def follow_by_list(self, followlist, times=1, sleep_delay=600,
                        interact=False):
         """Allows to follow by any scrapped list"""
@@ -986,6 +998,17 @@ class FacebookPy:
                 continue
             friends.append(uid)
         return friends
+
+    def get_recent_unnamed_friend_urls(self):
+        self.browser.get("https://www.facebook.com/{}/friends_recent".format(self.userid))
+        friend_elems = self.browser.find_elements_by_css_selector("ul > li > div > div > div.uiProfileBlockContent > div > div:nth-child(2) > div > a")
+        friend_urls = []
+        for friend_elem  in friend_elems:
+            uid = friend_elem.get_attribute('href').split('?')[0].split('/')[3]
+            if uid != 'profile.php':
+                continue
+            friend_urls.append(friend_elem.get_attribute('href'))
+        return friend_urls
 
     def withdraw_outgoing_friends_requests(self, sleep_delay=6):
         delay_random = random.randint(
