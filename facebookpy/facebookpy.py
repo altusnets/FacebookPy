@@ -8,6 +8,7 @@ import pprint as pp
 # from sys import platform
 # from platform import python_version
 import os
+import sqlite3
 # import csv
 # import json
 # import requests
@@ -71,7 +72,7 @@ from .commenters_util import get_post_urls_from_profile
 # from .relationship_tools import get_nonfollowers
 # from .relationship_tools import get_fans
 # from .relationship_tools import get_mutual_following
-from socialcommons.database_engine import get_database
+from .database_engine import get_database
 # from socialcommons.text_analytics import text_analysis
 # from socialcommons.text_analytics import yandex_supported_languages
 from socialcommons.browser import set_selenium_local_session
@@ -85,6 +86,7 @@ from selenium.common.exceptions import NoSuchElementException
 from socialcommons.exceptions import SocialPyError
 from .settings import Settings
 import pyautogui
+import traceback
 
 HOME = "/Users/ishandutta2007"
 CWD = HOME + "/Documents/Projects/FacebookPy"
@@ -188,6 +190,7 @@ class FacebookPy:
         self.already_Visited = 0
 
         self.follow_times = 1
+        self.invite_times = 1
         self.do_follow = False
         self.follow_percentage = 0
         self.dont_include = set()
@@ -834,6 +837,64 @@ class FacebookPy:
                             self.logfolder, Settings)
         return validation, details
 
+    def invite_restriction(self, operation, pagename, username, limit, logger):
+        """ Keep track of the followed users and help avoid excessive follow of
+        the same user """
+        try:
+            # get a DB and start a connection
+            db, id = get_database(Settings)
+            conn = sqlite3.connect(db)
+
+            with conn:
+                conn.row_factory = sqlite3.Row
+                cur = conn.cursor()
+
+                cur.execute(
+                    "SELECT * FROM inviteRestriction WHERE profile_id=:id_var "
+                    "AND pagename=:page_var AND username=:name_var",
+                    {"id_var": id, "page_var": pagename,  "name_var": username})
+                data = cur.fetchone()
+                invite_data = dict(data) if data else None
+
+                if operation == "write":
+                    if invite_data is None:
+                        # write a new record
+                        cur.execute(
+                            "INSERT INTO inviteRestriction (profile_id, "
+                            "pagename, username, times) VALUES (?, ?, ?, ?)",
+                            (id, pagename, username, 1))
+                    else:
+                        # update the existing record
+                        invite_data["times"] += 1
+                        sql = "UPDATE inviteRestriction set times = ? WHERE " \
+                              "profile_id=? AND pagename = ? AND username = ?"
+                        cur.execute(sql, (invite_data["times"], id, pagename, username))
+
+                    # commit the latest changes
+                    conn.commit()
+
+                elif operation == "read":
+                    if invite_data is None:
+                        return False
+
+                    elif invite_data["times"] < limit:
+                        return False
+
+                    else:
+                        exceed_msg = "" if invite_data[
+                            "times"] == limit else "more than "
+                        logger.info("---> {} has already been invited {}{} times"
+                                    .format(username, exceed_msg, str(limit)))
+                        return True
+        except Exception as exc:
+            logger.error(
+                "Dap! Error occurred with invite Restriction:\n\t{}".format(
+                    str(exc).encode("utf-8")))
+            traceback.print_exc()
+        finally:
+            if conn:
+                conn.close()
+
     def fetch_smart_comments(self, is_video, temp_comments):
         if temp_comments:
             # Use clarifai related comments only!
@@ -925,6 +986,29 @@ class FacebookPy:
             friends.append(uid)
         return friends
 
+    def add_likers_of_page(self, page_likers_url, sleep_delay=6):
+        delay_random = random.randint(
+                    ceil(sleep_delay * 0.85),
+                    ceil(sleep_delay * 1.14))        
+        self.browser.get(page_likers_url)
+        add_btns = self.browser.find_elements_by_css_selector("button.FriendRequestAdd.addButton")
+
+        pending = 0
+        for btn in add_btns:
+            try:
+                if 'hidden_elem' in btn.get_attribute('class'):
+                    pending += 1
+                    continue
+                ActionChains(self.browser).move_to_element(btn).perform()
+                ActionChains(self.browser).click().perform()
+                self.logger.info("Clicked")
+                sleep(delay_random)
+            except Exception as e:
+                self.logger.error(e)
+
+        if pending > 0:
+            self.logger.info("{} pending sent outs".format(pending))
+
     def invite_friends_to_page(self, friendslist, pagename, sleep_delay=6):
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
@@ -932,6 +1016,9 @@ class FacebookPy:
         successfully_invited_friends = []
         for friend in friendslist:
             try:
+                if self.invite_restriction("read", pagename, friend, self.invite_times, self.logger):
+                    self.logger.info('Already invited {} to page {}, {} times'.format(friend, pagename, self.invite_times))
+                    continue
                 self.logger.info("Visiting {}".format(friend))
                 self.browser.get("https://www.facebook.com/{}".format(friend))
                 ellipse_elem = self.browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div > div > button > i")
@@ -961,17 +1048,19 @@ class FacebookPy:
                     if text_elem.text!=pagename:
                         continue
                     button_elem = row.find_element_by_css_selector("td:nth-child(3) > button")
-                    if button_elem.text != 'Invited':
+                    if button_elem.text == 'Invited':
                         self.logger.info('Already invited: {}'.format(friend))
-                        successfully_invited_friends.append(friend)
+                        successfully_invited_friends.append(friend)                    
+                        self.invite_restriction("write", pagename, friend, None, self.logger)
                     else:
                         ActionChains(self.browser).move_to_element(button_elem).perform()
                         ActionChains(self.browser).click().perform()
                         self.logger.info('~---> Just invited: {}'.format(friend))
                         successfully_invited_friends.append(friend)
+                        self.invite_restriction("write", pagename, friend, None, self.logger)
                         sleep(delay_random)
             except Exception as e:
-                self.logger.info("Failed for friend {}".format(friend))
+                self.logger.error("Failed for friend {} with error {}".format(friend, e))
         return successfully_invited_friends
 
     def interact_by_users(self,
@@ -1577,6 +1666,7 @@ class FacebookPy:
         return all(self.is_mandatory_character(uchr)
                    for uchr in unistr
                    if uchr.isalpha())
+
 
 @contextmanager
 def smart_run(session):

@@ -66,6 +66,7 @@ session = FacebookPy(username="abc",
   * [Quota Supervisor](#quota-supervisor)
   * [Get recent friends](#get-recent-friends):
   * [Invite friends to page](#invite-friends-to-page) 
+  * [Add likers of page](#add-likers-of-page)
 
 <br />
 
@@ -247,7 +248,12 @@ session = FacebookPy(username=facebook_username, password=facebook_password, byp
   session.invite_friends_to_page(friendslist=['samantha3', 'larry_ok'])
 ```
 
- 
+### add likers of page
+
+```python
+     session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/101771478880/likers?f=AbqfdHqQ9CNUi3xZPT6BlmnyGrDaZjR95UkZkJMjMQIlPUvwblytgVaUg69FjTdlHnRayhaftiKR9pPMZ5tkczTQbHbWWq-2nOCQ-qvVMC8IOw")
+```
+
 ## How to run:
 
  -  modify `quickstart.py` according to your requirements
