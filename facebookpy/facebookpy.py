@@ -942,7 +942,7 @@ class FacebookPy:
                 while(retry_times < 10):
                     try:
                         sleep(delay_random)
-                        dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/invite_to_page_option.png', grayscale=True, confidence=.9)
+                        dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/invite_to_page_option.png', grayscale=True, confidence=.7)
                         self.logger.info("invite_to_page_option.png is Visible, lets click it")
                         pyautogui.moveTo(dropx, dropy)
                         sleep(delay_random)
@@ -967,7 +967,7 @@ class FacebookPy:
                     else:
                         ActionChains(self.browser).move_to_element(button_elem).perform()
                         ActionChains(self.browser).click().perform()
-                        self.logger.info('Just invited: {}'.format(friend))
+                        self.logger.info('~---> Just invited: {}'.format(friend))
                         successfully_invited_friends.append(friend)
                         sleep(delay_random)
             except Exception as e:
