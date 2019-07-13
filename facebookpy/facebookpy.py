@@ -63,6 +63,7 @@ from .unfollow_util  import dump_follow_restriction
 # from .unfollow_util  import get_follow_requests
 from .unfriend_util import friend_user
 from .unfriend_util import unfriend_user
+from .unfriend_util import unfriend_user_by_url
 # from .commenters_util import extract_information
 from .commenters_util import users_liked
 from .commenters_util import get_post_urls_from_profile
@@ -313,7 +314,7 @@ class FacebookPy:
             file_handler.setLevel(logging.DEBUG)
             extra = {"username": self.username}
             logger_formatter = logging.Formatter(
-                '%(levelname)s [%(asctime)s] [%(username)s]  %(message)s',
+                '%(levelname)s [%(asctime)s] [FacebookPy:%(username)s]  %(message)s',
                 datefmt='%Y-%m-%d %H:%M:%S')
             file_handler.setFormatter(logger_formatter)
             logger.addHandler(file_handler)
