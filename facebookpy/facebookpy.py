@@ -1071,11 +1071,12 @@ class FacebookPy:
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
-        successfully_invited_friends = []
+        net_invited_friends = []
         for friend in friendslist:
             try:
                 if self.invite_restriction("read", pagename, friend, self.invite_times, self.logger):
                     self.logger.info('Already invited {} to page {}, {} times'.format(friend, pagename, self.invite_times))
+                    net_invited_friends.append(friend)
                     continue
                 self.logger.info("Visiting {}".format(friend))
                 self.browser.get("https://www.facebook.com/{}".format(friend))
@@ -1108,18 +1109,18 @@ class FacebookPy:
                     button_elem = row.find_element_by_css_selector("td:nth-child(3) > button")
                     if button_elem.text == 'Invited':
                         self.logger.info('Already invited: {}'.format(friend))
-                        successfully_invited_friends.append(friend)                    
+                        net_invited_friends.append(friend)
                         self.invite_restriction("write", pagename, friend, None, self.logger)
                     else:
                         ActionChains(self.browser).move_to_element(button_elem).perform()
                         ActionChains(self.browser).click().perform()
                         self.logger.info('~---> Just invited: {}'.format(friend))
-                        successfully_invited_friends.append(friend)
+                        net_invited_friends.append(friend)
                         self.invite_restriction("write", pagename, friend, None, self.logger)
                         sleep(delay_random)
             except Exception as e:
                 self.logger.error("Failed for friend {} with error {}".format(friend, e))
-        return successfully_invited_friends
+        return net_invited_friends
 
     def interact_by_users(self,
                           usernames,

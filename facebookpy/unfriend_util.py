@@ -252,7 +252,6 @@ def unfriend_user_by_url(browser, track, login, url, button, blacklist,
             pyautogui.doubleClick()
             sleep(delay_random)
             logger.info("unfriend.png Clicked")
-            friend_restriction("write", userid_to_unfriend, None, logger)
             break
         except Exception as e:
             logger.info('unfriend.png is not yet visible. Error: {}'.format(e))
