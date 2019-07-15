@@ -1,6 +1,6 @@
 from datetime import datetime
 import sqlite3
-import time
+# import time
 from math import ceil
 import random
 
@@ -17,7 +17,6 @@ from socialcommons.util import reload_webpage
 from socialcommons.util import web_address_navigator
 from socialcommons.util import click_visibly
 from socialcommons.print_log_writer import log_friended_pool
-# from socialcommons.print_log_writer import log_record_all_friended
 from socialcommons.database_engine import get_database
 from socialcommons.quota_supervisor import quota_supervisor
 from .settings import Settings

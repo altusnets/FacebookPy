@@ -4,90 +4,53 @@ import time
 from math import ceil
 import random
 import traceback
-import pprint as pp
-# from sys import platform
-# from platform import python_version
 import os
 import sqlite3
-# import csv
-# import json
-# import requests
-from selenium import webdriver
-from selenium.webdriver import DesiredCapabilities
 from pyvirtualdisplay import Display
 import logging
 from contextlib import contextmanager
-# from copy import deepcopy
 import unicodedata
 from sys import exit as clean_exit
 from tempfile import gettempdir
 
-# import FacebookPy modules
-# from socialcommons.clarifai_util import check_image
 from .comment_util import comment_image
 from .comment_util import verify_commenting
-# from .comment_util import get_comments_on_post
 from .like_util import check_link
 from .like_util import verify_liking
-# from .like_util import get_links_for_tag
-# from .like_util import get_links_from_feed
-# from .like_util import get_tags
-# from .like_util import get_links_for_location
 from .like_util import like_image
 from .like_util import get_links_for_username
-# from .like_util import like_comment
 from .login_util import login_user
-# from .settings import Settings
 from socialcommons.print_log_writer import log_follower_num
 from socialcommons.print_log_writer import log_following_num
 
 from socialcommons.time_util import sleep
-# from socialcommons.time_util import set_sleep_percentage
-# from socialcommons.util import get_active_users
 from socialcommons.util import validate_userid
-from socialcommons.util import web_address_navigator
 from socialcommons.util import interruption_handler
 from socialcommons.util import highlight_print
-# from socialcommons.util import dump_record_activity
 from socialcommons.util import truncate_float
 from socialcommons.util import save_account_progress
 from socialcommons.util import parse_cli_args
 from .unfollow_util  import get_given_user_followers
-# from .unfollow_util  import get_given_user_following
-# from .unfollow_util  import unfollow
 from .unfollow_util  import unfollow_user
 from .unfollow_util  import follow_user
 from .unfollow_util  import follow_restriction
 from .unfollow_util  import dump_follow_restriction
-# from .unfollow_util  import set_automated_followed_pool
-# from .unfollow_util  import get_follow_requests
 from .unfriend_util import friend_user
 from .unfriend_util import unfriend_user
 from .unfriend_util import unfriend_user_by_url
-# from .commenters_util import extract_information
 from .commenters_util import users_liked
 from .commenters_util import get_post_urls_from_profile
-# from .relationship_tools import get_following
-# from .relationship_tools import get_followers
-# from .relationship_tools import get_unfollowers
-# from .relationship_tools import get_nonfollowers
-# from .relationship_tools import get_fans
-# from .relationship_tools import get_mutual_following
 from .database_engine import get_database
-# from socialcommons.text_analytics import text_analysis
-# from socialcommons.text_analytics import yandex_supported_languages
 from socialcommons.browser import set_selenium_local_session
 from socialcommons.browser import close_browser
 from socialcommons.file_manager import get_workspace
 from socialcommons.file_manager import get_logfolder
 
 from selenium.webdriver.common.action_chains import ActionChains
-# import exceptions
 from selenium.common.exceptions import NoSuchElementException
 from socialcommons.exceptions import SocialPyError
 from .settings import Settings
 import pyautogui
-import traceback
 
 HOME = "/Users/ishandutta2007"
 CWD = HOME + "/Documents/Projects/FacebookPy"
@@ -473,9 +436,9 @@ class FacebookPy:
                         print(profile, dob)
                         continue
                     except Exception as e:
-                        pass
-
+                        self.logger.error(e)
         except Exception as e:
+                self.logger.error(e)
                 traceback.print_exc()
 
 
@@ -666,8 +629,7 @@ class FacebookPy:
         commented_init = self.commented
         inap_img_init = self.inap_img
 
-        relax_point = random.randint(7,
-                                     14)  # you can use some plain value
+        relax_point = random.randint(7, 14)  # you can use some plain value
         # `10` instead of this quitely randomized score
         self.quotient_breach = False
 
@@ -932,16 +894,12 @@ class FacebookPy:
             rows = self.browser.find_elements_by_css_selector("div.ruResponseSectionContainer")
             for i in range(0, len(rows)):
                 try:
-                    row_item = self.browser.find_elements_by_css_selector("div.ruResponseSectionContainer")[i]
                     confirm_button = self.browser.find_elements_by_css_selector("div.ruResponseSectionContainer")[i].find_element_by_xpath("//div/div/div[2]/div/div/button[text()='Confirm']")
                     self.logger.info("Confirm button found, confirming...")
                     try:
                         confirm_button.click()
-                        # self.browser.execute_script("var evt = document.createEvent('MouseEvents');" + "evt.initMouseEvent('click',true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0,null);" + "arguments[0].dispatchEvent(evt);", row_item.find_elements_by_css_selector("div.ruResponseSectionContainer")[i].find_element_by_xpath("//div/div/div[2]/div/div/button[text()='Confirm']"))
-                        # ActionChains(self.browser).move_to_element(confirm_button).perform()
-                        # ActionChains(self.browser).click().perform()
                     except Exception as e:
-                        pass
+                        self.logger.error(e)
                     self.logger.info("Clicked {}".format(confirm_button.text))
                     confirms += 1
                     self.logger.info("Confirms sent in this iteration: {}".format(confirms))
@@ -975,7 +933,7 @@ class FacebookPy:
                         # ActionChains(self.browser).move_to_element(confirm_button).perform()
                         # ActionChains(self.browser).click().perform()
                     except Exception as e:
-                        pass
+                        self.logger.error(e)
                     self.logger.info("Clicked {}".format(confirm_button.text))
                     adds += 1
                     self.logger.info("Add Friends sent in this iteration: {}".format(adds))
