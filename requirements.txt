@@ -31,9 +31,6 @@ facebookpy == 0.0.2
 # facebookpy/facebookpy.py: 434
 python_dateutil == 2.7.2
 
-# setup.py: 3
-setuptools == 39.2.0
-
 # facebookpy/comment_util.py: 15,16
 # facebookpy/commenters_util.py: 17
 # facebookpy/facebookpy.py: 49,50
@@ -41,4 +38,7 @@ setuptools == 39.2.0
 # facebookpy/login_util.py: 5,15,16
 # facebookpy/unfollow_util.py: 32,33
 # facebookpy/unfriend_util.py: 23,24,25
-~~lenium == 3.0.2
+selenium == 3.141.0
+
+# setup.py: 3
+setuptools == 39.2.0
