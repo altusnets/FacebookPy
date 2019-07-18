@@ -59,8 +59,7 @@ with smart_run(session):
     # session.fetch_birthdays()
     # session.confirm_friends()
     # session.add_suggested_friends()
-    # session.withdraw_outgoing_friends_requests()
-
+    session.withdraw_outgoing_friends_requests()
     friendslist = session.get_recent_friends()
     print('recent friends', friendslist)
     net_invited_friends = session.invite_friends_to_page(friendslist=friendslist, pagename="PickLively")
@@ -72,10 +71,4 @@ with smart_run(session):
     unnamed_friend_urls = session.get_recent_unnamed_friend_urls()
     print('recent unnamed_friend_urls', unnamed_friend_urls)
     session.unfriend_by_urllist(urllist=unnamed_friend_urls)
-
-    plus = session.get_page_likers_urls(search_term="dream11")
-    print(len(plus))
-    pp.pprint(plus)
-    for each plu in plus:
-        session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/101771478880/likers?f=AbqfdHqQ9CNUi3xZPT6BlmnyGrDaZjR95UkZkJMjMQIlPUvwblytgVaUg69FjTdlHnRayhaftiKR9pPMZ5tkczTQbHbWWq-2nOCQ-qvVMC8IOw")
-
+    session.add_likers_from_term(search_term="dream11")

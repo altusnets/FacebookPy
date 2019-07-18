@@ -1014,30 +1014,52 @@ class FacebookPy:
             except Exception as e:
                 self.logger.error(e)
 
-    def get_page_likers_urls(self, search_term):
+    def refresh_links(self):
+        likers_buttons = self.browser.find_elements_by_css_selector("div > div._4bl9 > div > div:nth-child(2) > div._glm > div > a")
+        likers_buttons.extend(self.browser.find_elements_by_css_selector("div > div._4bl9 > div > div:nth-child(2) > div._glm > div > a:nth-child(1)"))
+        return likers_buttons
+
+    def add_likers_from_term(self, search_term):
         search_url = "https://www.facebook.com/search/pages/?q=" + search_term + "&epa=SERP_TAB"
         self.browser.get(search_url)
         for i in range(10):
             self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
+        likers_buttons = self.refresh_links()
+        sleep(2)
         links = []
-        likers_buttons = self.browser.find_elements_by_css_selector("div > div._4bl9 > div > div:nth-child(2) > div._glm > div > a")
-        likers_buttons.extend(self.browser.find_elements_by_css_selector("div > div._4bl9 > div > div:nth-child(2) > div._glm > div > a:nth-child(1)"))
-        for likers_button in likers_buttons:
-            link = likers_button.get_attribute('href')
-            if 'likers' in link:
-                links.append()
-        return links
+        added = 0
+        for i in range(len(likers_buttons)):
+            try:
+                likers_button = likers_buttons[i]
+                link = likers_button.get_attribute('href')
+                if 'likers' in link:
+                    links.append(link)
+                    if added < 20:
+                        added = self.add_likers_of_page(link, added=added)
+                        sleep(1)
+                        self.browser.execute_script("window.history.go(-1)")
+                        sleep(1)
+                        likers_buttons = self.refresh_links()
+                    else:
+                        self.logger.error("Enough adding for now")
+                        break
+            except Exception as e:
+                self.logger.error(e)
 
-    def add_likers_of_page(self, page_likers_url, sleep_delay=6):
+    def add_likers_of_page(self, page_likers_url, added, sleep_delay=6):
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
         self.browser.get(page_likers_url)
+        self.logger.info("Visiting : {}".format(page_likers_url))
+
+        en_txt = self.browser.find_element_by_css_selector("#pagelet_rhc_footer > div > div.uiContextualLayerParent > div > div > div > div > span:nth-child(1)")
+
         add_btns = self.browser.find_elements_by_css_selector("button.FriendRequestAdd.addButton")
 
         pending = 0
-        for btn in add_btns:
+        for i, btn in enumerate(add_btns):
             try:
                 if 'hidden_elem' in btn.get_attribute('class'):
                     pending += 1
@@ -1046,11 +1068,23 @@ class FacebookPy:
                 ActionChains(self.browser).click().perform()
                 self.logger.info("{} Clicked".format(btn.text))
                 sleep(delay_random)
+
+                #Dummy clicking outside to close the pop menu
+                ActionChains(self.browser).move_to_element(en_txt).perform()
+                ActionChains(self.browser).click().perform()
+                self.logger.info("{} Clicked".format(en_txt.text))
+                sleep(delay_random)
+                added += 1
             except Exception as e:
                 self.logger.error(e)
+            self.browser.execute_script("window.scrollTo(0, " + str((i+1)*142) + ");")
 
         if pending > 0:
             self.logger.info("{} pending sent outs".format(pending))
+
+        self.logger.info("Total added so far: {}".format(added))
+
+        return added
 
     def invite_friends_to_page(self, friendslist, pagename, sleep_delay=6):
         delay_random = random.randint(

@@ -66,7 +66,7 @@ session = FacebookPy(username="abc",
   * [Quota Supervisor](#quota-supervisor)
   * [Get recent friends](#get-recent-friends):
   * [Invite friends to page](#invite-friends-to-page) 
-  * [Add likers of page](#add-likers-of-page)
+  * [Add likers from term](#add-likers-from-term)
   * [Withdraw outgoing friends requests](#withdraw-outgoing-friends-requests)
 
 <br />
@@ -257,10 +257,12 @@ session = FacebookPy(username=facebook_username, password=facebook_password, byp
   session.invite_friends_to_page(friendslist=['samantha3', 'larry_ok'])
 ```
 
-### add likers of page
+### add likers from term
+
+It searches for pages with a term , then visits each of those pages and adds the likers of those pages
 
 ```python
-     session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/101771478880/likers?f=AbqfdHqQ9CNUi3xZPT6BlmnyGrDaZjR95UkZkJMjMQIlPUvwblytgVaUg69FjTdlHnRayhaftiKR9pPMZ5tkczTQbHbWWq-2nOCQ-qvVMC8IOw")
+     session.add_likers_from_term(search_term = "fantasy")
 ```
 
 
