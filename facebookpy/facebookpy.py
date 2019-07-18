@@ -575,8 +575,12 @@ class FacebookPy:
                                             self.logger,
                                             self.logfolder)
 
-    def unfriend_by_list(self, friendlist, sleep_delay=6):
+    def unfriend_by_list(self, friendlist, pagename, sleep_delay=6):
         for acc_to_unfriend in friendlist:
+            if not self.invite_restriction("read", pagename, acc_to_unfriend, self.invite_times, self.logger):
+                self.logger.info('Not yet invited {} to page {}, so not unfriending now'.format(friend, pagename))
+                continue
+
             friend_state, msg = unfriend_user(self.browser,
                                             "profile",
                                             self.username,
@@ -969,12 +973,16 @@ class FacebookPy:
             friend_urls.append(friend_elem.get_attribute('href'))
         return friend_urls
 
-    def withdraw_outgoing_friends_requests(self, sleep_delay=6):
+    def withdraw_outgoing_friends_requests(self, ignore_few=True, sleep_delay=6):
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
         self.browser.get("https://www.facebook.com/friends/requests/?fcref=ft&outgoing=1")
         sent_btns = self.browser.find_elements_by_css_selector("button.FriendRequestOutgoing.outgoingButton")
+        self.logger.info("Total outgoing: {}".format(len(sent_btns)))
+        if ignore_few and len(sent_btns) < 10:
+            self.logger.info("Too few outgoing, hence returning")
+            return
         for btn in sent_btns:
             try:
                 if 'hidden_elem' in btn.get_attribute('class'):
@@ -983,24 +991,43 @@ class FacebookPy:
                 ActionChains(self.browser).click().perform()
                 self.logger.info("{} Clicked".format(btn.text))
                 sleep(delay_random)
-                retry_times = 0
-                while(retry_times < 10):
-                    try:
-                        sleep(delay_random)
-                        dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/cancel_request.png', grayscale=True, confidence=.7)
-                        self.logger.info("cancel_request.png is Visible, lets click it")
-                        pyautogui.moveTo(dropx, dropy)
-                        sleep(delay_random)
-                        pyautogui.click()
-                        pyautogui.doubleClick()
-                        sleep(delay_random*5)
-                        self.logger.info("cancel_request.png Clicked")
-                        break
-                    except Exception as e:
-                        self.logger.info('cancel_request.png is not yet visible. Error: {}'.format(e))
-                    retry_times = retry_times + 1
+
+                cancel_request_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Cancel Request')]")
+                cancel_request_button.click()
+                sleep(delay_random)
+                # retry_times = 0
+                # while(retry_times < 10):
+                #     try:
+                #         sleep(delay_random)
+                #         dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/cancel_request.png', grayscale=True, confidence=.7)
+                #         self.logger.info("cancel_request.png is Visible, lets click it")
+                #         pyautogui.moveTo(dropx, dropy)
+                #         sleep(delay_random)
+                #         pyautogui.click()
+                #         pyautogui.doubleClick()
+                #         sleep(delay_random*5)
+                #         self.logger.info("cancel_request.png Clicked")
+                #         break
+                #     except Exception as e:
+                #         self.logger.info('cancel_request.png is not yet visible. Error: {}'.format(e))
+                #     retry_times = retry_times + 1
             except Exception as e:
                 self.logger.error(e)
+
+    def get_page_likers_urls(self, search_term):
+        search_url = "https://www.facebook.com/search/pages/?q=" + search_term + "&epa=SERP_TAB"
+        self.browser.get(search_url)
+        for i in range(10):
+            self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+        links = []
+        likers_buttons = self.browser.find_elements_by_css_selector("div > div._4bl9 > div > div:nth-child(2) > div._glm > div > a")
+        likers_buttons.extend(self.browser.find_elements_by_css_selector("div > div._4bl9 > div > div:nth-child(2) > div._glm > div > a:nth-child(1)"))
+        for likers_button in likers_buttons:
+            link = likers_button.get_attribute('href')
+            if 'likers' in link:
+                links.append()
+        return links
 
     def add_likers_of_page(self, page_likers_url, sleep_delay=6):
         delay_random = random.randint(
@@ -1042,22 +1069,30 @@ class FacebookPy:
                 ActionChains(self.browser).move_to_element(ellipse_elem).perform()
                 ActionChains(self.browser).click().perform()
                 sleep(delay_random)
-                retry_times = 0
-                while(retry_times < 10):
-                    try:
-                        sleep(delay_random)
-                        dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/invite_to_page_option.png', grayscale=True, confidence=.7)
-                        self.logger.info("invite_to_page_option.png is Visible, lets click it")
-                        pyautogui.moveTo(dropx, dropy)
-                        sleep(delay_random)
-                        pyautogui.click()
-                        pyautogui.doubleClick()
-                        sleep(delay_random)
-                        self.logger.info("invite_to_page_option.png Clicked")
-                        break
-                    except Exception as e:
-                        self.logger.info('invite_to_page_option.png is not yet visible. Error: {}'.format(e))
-                    retry_times = retry_times + 1
+
+                title_name = self.browser.find_element_by_css_selector("span#fb-timeline-cover-name > a")
+                first_name = title_name.text.split(' ')[0]
+
+                invite_to_page_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Invite " + first_name + " to like your Pages')]")
+                invite_to_page_button.click()
+                sleep(delay_random)
+
+                # retry_times = 0
+                # while(retry_times < 10):
+                #     try:
+                #         sleep(delay_random)
+                #         dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/invite_to_page_option.png', grayscale=True, confidence=.7)
+                #         self.logger.info("invite_to_page_option.png is Visible, lets click it")
+                #         pyautogui.moveTo(dropx, dropy)
+                #         sleep(delay_random)
+                #         pyautogui.click()
+                #         pyautogui.doubleClick()
+                #         sleep(delay_random)
+                #         self.logger.info("invite_to_page_option.png Clicked")
+                #         break
+                #     except Exception as e:
+                #         self.logger.info('invite_to_page_option.png is not yet visible. Error: {}'.format(e))
+                #     retry_times = retry_times + 1
                 sleep(delay_random)
                 rows = self.browser.find_elements_by_css_selector("div > div > div > div > div > div > div > div > div.uiScrollableArea > div.uiScrollableAreaWrap > div > div > ul > li > div > table > tbody > tr")
                 for row in rows:

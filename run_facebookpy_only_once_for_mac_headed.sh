@@ -4,6 +4,12 @@
 # The following is an example of a cron scheduled every 10 mins
 # */10 * * * * bash /path/to/FacebookPy/run_facebookpy_only_once_for_mac.sh /path/to/FacebookPy/quickstart.py $USERNAME $PASSWORD $USERID
 
+/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "Sublime Text")) whose role description is "minimize button")'
+/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "Finder")) whose role description is "minimize button")'
+/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "System Preferences")) whose role description is "minimize button")'
+/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "Terminal")) whose role description is "minimize button")'
+/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "Safari")) whose role description is "minimize button")'
+
 TEMPLATE_PATH=$1
 USERNAME=$2
 PASSWORD=$3
@@ -20,7 +26,7 @@ then
    echo "$TEMPLATE_PATH is already running"
 else
    echo "Starting $TEMPLATE_PATH"
-   /Users/ishandutta2007/.pyenv/shims/python $TEMPLATE_PATH -u $USERNAME -p $PASSWORD -ui $USERID --disable_image_load
+   /Users/ishandutta2007/.pyenv/shims/python $TEMPLATE_PATH -u $USERNAME -p $PASSWORD -ui $USERID --disable_image_load --disable_image_load
    #/Users/ishandutta2007/.pyenv/shims/python $TEMPLATE_PATH -u $USERNAME -p $PASSWORD -ui $USERID --headless-browser --disable_image_load
 fi
 

@@ -5,6 +5,7 @@ from facebookpy import FacebookPy
 from facebookpy import smart_run
 from socialcommons.file_manager import set_workspace
 from facebookpy import settings
+import pprint as pp
 
 # set workspace folder at desired location (default is at your home folder)
 set_workspace(settings.Settings, path=None)
@@ -58,9 +59,23 @@ with smart_run(session):
     # session.fetch_birthdays()
     # session.confirm_friends()
     # session.add_suggested_friends()
-    session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/101771478880/likers?f=AbqfdHqQ9CNUi3xZPT6BlmnyGrDaZjR95UkZkJMjMQIlPUvwblytgVaUg69FjTdlHnRayhaftiKR9pPMZ5tkczTQbHbWWq-2nOCQ-qvVMC8IOw")
-    session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/396185197414302/likers?f=Abr2VwU_kVVCXkwXPkbFfo5QA6ox7BqvKuYrW4-7EWS0b5Y61Y6gq3sCsC8zpAnZ1cxTfYD2IN38YJNRx5WY0lwG0tpwSLkhefV1l2_DnnKZVA")
-    session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/1600562606933560/likers?f=AbpMXTubybrIpSgniVJL1ec2qzhJSC7nQcNm1hASbLwweGWRhGd1Kf7iTZ6eLkeBaQ25mzzuBAtRVHEzCFJFa6mNHlYErYW1Cq60kwSLCRrDag")
-    session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/1294302220678964/likers?f=AbrmGJINmsaOpOTe2Bu8Hys68kZpJ_S5IWSiw7s5kMQ7K0qAzUAVLFZV7IieErNlc34bADViG3KFbs6KMTGcYqCWg1MnF6X1nkWG1uEiLxDzDA")
-    session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/1164458926994976/likers?f=AboHFE1rZyA9tE6ykLZBMTtDtpiFvMuhEjcuZDkOYD-GtaUI_PuMgr9yuAR7yFLU4hByI0vp_2W8GqBY1LtkDlGc73nIhzUjCNVbChBxyf8uPw&ref=snippets")
+    # session.withdraw_outgoing_friends_requests()
+
+    friendslist = session.get_recent_friends()
+    print('recent friends', friendslist)
+    net_invited_friends = session.invite_friends_to_page(friendslist=friendslist, pagename="PickLively")
+    print('successfully invited friends', net_invited_friends)
+    if len(net_invited_friends) >= 6:
+        random.shuffle(net_invited_friends)
+        net_invited_friends = net_invited_friends[0:3]
+        session.unfriend_by_list(friendlist=net_invited_friends, pagename="PickLively")
+    unnamed_friend_urls = session.get_recent_unnamed_friend_urls()
+    print('recent unnamed_friend_urls', unnamed_friend_urls)
+    session.unfriend_by_urllist(urllist=unnamed_friend_urls)
+
+    plus = session.get_page_likers_urls(search_term="dream11")
+    print(len(plus))
+    pp.pprint(plus)
+    for each plu in plus:
+        session.add_likers_of_page(page_likers_url = "https://www.facebook.com/search/101771478880/likers?f=AbqfdHqQ9CNUi3xZPT6BlmnyGrDaZjR95UkZkJMjMQIlPUvwblytgVaUg69FjTdlHnRayhaftiKR9pPMZ5tkczTQbHbWWq-2nOCQ-qvVMC8IOw")
 

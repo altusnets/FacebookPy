@@ -200,26 +200,30 @@ def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
     friend_button_elem = browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
     ActionChains(browser).move_to_element(friend_button_elem).perform()
     ActionChains(browser).click().perform()
+    sleep(delay_random)
 
+    unfriend_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Unfriend')]")
+    unfriend_button.click()
     sleep(delay_random)
-    retry_times = 0
-    while(retry_times < 10):
-        try:
-            sleep(delay_random)
-            dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/unfriend.png', grayscale=True, confidence=.6)
-            logger.info("unfriend.png is Visible, lets click it")
-            pyautogui.moveTo(dropx, dropy)
-            sleep(delay_random)
-            pyautogui.click()
-            pyautogui.doubleClick()
-            sleep(delay_random)
-            logger.info("unfriend.png Clicked")
-            friend_restriction("write", userid_to_unfriend, None, logger)
-            break
-        except Exception as e:
-            logger.info('unfriend.png is not yet visible. Error: {}'.format(e))
-        retry_times = retry_times + 1
-    sleep(delay_random)
+
+    # retry_times = 0
+    # while(retry_times < 10):
+    #     try:
+    #         sleep(delay_random)
+    #         dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/unfriend.png', grayscale=True, confidence=.6)
+    #         logger.info("unfriend.png is Visible, lets click it")
+    #         pyautogui.moveTo(dropx, dropy)
+    #         sleep(delay_random)
+    #         pyautogui.click()
+    #         pyautogui.doubleClick()
+    #         sleep(delay_random)
+    #         logger.info("unfriend.png Clicked")
+    #         friend_restriction("write", userid_to_unfriend, None, logger)
+    #         break
+    #     except Exception as e:
+    #         logger.info('unfriend.png is not yet visible. Error: {}'.format(e))
+    #     retry_times = retry_times + 1
+    # sleep(delay_random)
     if retry_times < 10:
         return True, "success"
     else:
