@@ -8,6 +8,7 @@ __pycache__/
 *$py.class
 
 quickstart.py
+pl.py
 docker_quickstart.py
 
 # C extensions

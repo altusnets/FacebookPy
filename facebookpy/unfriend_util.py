@@ -237,33 +237,42 @@ def unfriend_user_by_url(browser, track, login, url, button, blacklist,
     delay_random = random.randint(
                 ceil(sleep_delay * 0.85),
                 ceil(sleep_delay * 1.14))
+    try:
+        friend_button_elem = browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
+        ActionChains(browser).move_to_element(friend_button_elem).perform()
+        ActionChains(browser).click().perform()
+        sleep(delay_random*2)
 
-    friend_button_elem = browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
-    ActionChains(browser).move_to_element(friend_button_elem).perform()
-    ActionChains(browser).click().perform()
-
-    sleep(delay_random)
-    retry_times = 0
-    while(retry_times < 10):
-        try:
-            sleep(delay_random)
-            dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/unfriend.png', grayscale=True, confidence=.6)
-            logger.info("unfriend.png is Visible, lets click it")
-            pyautogui.moveTo(dropx, dropy)
-            sleep(delay_random)
-            pyautogui.click()
-            pyautogui.doubleClick()
-            sleep(delay_random)
-            logger.info("unfriend.png Clicked")
-            break
-        except Exception as e:
-            logger.info('unfriend.png is not yet visible. Error: {}'.format(e))
-        retry_times = retry_times + 1
-    sleep(delay_random)
-    if retry_times < 10:
+        unfriend_button = browser.find_element_by_xpath("//*[contains(text(), 'Unfriend')]")
+        unfriend_button.click()
+        sleep(delay_random)
         return True, "success"
-    else:
+    except Exception as e:
+        logger.error(e)
         return False, ""
+
+    # sleep(delay_random)
+    # retry_times = 0
+    # while(retry_times < 10):
+    #     try:
+    #         sleep(delay_random)
+    #         dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/unfriend.png', grayscale=True, confidence=.6)
+    #         logger.info("unfriend.png is Visible, lets click it")
+    #         pyautogui.moveTo(dropx, dropy)
+    #         sleep(delay_random)
+    #         pyautogui.click()
+    #         pyautogui.doubleClick()
+    #         sleep(delay_random)
+    #         logger.info("unfriend.png Clicked")
+    #         break
+    #     except Exception as e:
+    #         logger.info('unfriend.png is not yet visible. Error: {}'.format(e))
+    #     retry_times = retry_times + 1
+    # sleep(delay_random)
+    # if retry_times < 10:
+    #     return True, "success"
+    # else:
+    #     return False, ""
 
 def friend_restriction(operation, username, limit, logger):
     """ Keep track of the friended users and help avoid excessive friend of

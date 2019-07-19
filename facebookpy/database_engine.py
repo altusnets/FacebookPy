@@ -22,6 +22,12 @@ SQL_CREATE_RECORD_ACTIVITY_TABLE = """
         `server_calls` INT UNSIGNED NOT NULL,
         `created` DATETIME NOT NULL);"""
 
+SQL_CREATE_FRIEND_RESTRICTION_TABLE = """
+    CREATE TABLE IF NOT EXISTS `friendRestriction` (
+        `profile_id` INTEGER REFERENCES `profiles` (id),
+        `username` TEXT NOT NULL,
+        `times` TINYINT UNSIGNED NOT NULL);"""
+
 SQL_CREATE_FOLLOW_RESTRICTION_TABLE = """
     CREATE TABLE IF NOT EXISTS `followRestriction` (
         `profile_id` INTEGER REFERENCES `profiles` (id),
@@ -72,6 +78,7 @@ def create_database(address, logger, name):
 
             create_tables(cursor, ["profiles",
                                    "recordActivity",
+                                   "friendRestriction",
                                    "followRestriction",
                                    "inviteRestriction",
                                    "accountsProgress"])
@@ -95,6 +102,9 @@ def create_tables(cursor, tables):
 
     if "recordActivity" in tables:
         cursor.execute(SQL_CREATE_RECORD_ACTIVITY_TABLE)
+
+    if "friendRestriction" in tables:
+        cursor.execute(SQL_CREATE_FRIEND_RESTRICTION_TABLE)
 
     if "followRestriction" in tables:
         cursor.execute(SQL_CREATE_FOLLOW_RESTRICTION_TABLE)

@@ -1064,9 +1064,11 @@ class FacebookPy:
                 if 'hidden_elem' in btn.get_attribute('class'):
                     pending += 1
                     continue
+                before_text = btn.text
+                self.logger.info("{} <=before clicking".format(before_text))
                 ActionChains(self.browser).move_to_element(btn).perform()
                 ActionChains(self.browser).click().perform()
-                self.logger.info("{} Clicked".format(btn.text))
+                self.logger.info("{} <=Clicked".format(btn.text))
                 sleep(delay_random)
 
                 #Dummy clicking outside to close the pop menu
@@ -1074,7 +1076,8 @@ class FacebookPy:
                 ActionChains(self.browser).click().perform()
                 self.logger.info("{} Clicked".format(en_txt.text))
                 sleep(delay_random)
-                added += 1
+                if before_text != btn.text:
+                    added += 1
             except Exception as e:
                 self.logger.error(e)
             self.browser.execute_script("window.scrollTo(0, " + str((i+1)*142) + ");")
@@ -1106,9 +1109,15 @@ class FacebookPy:
 
                 title_name = self.browser.find_element_by_css_selector("span#fb-timeline-cover-name > a")
                 first_name = title_name.text.split(' ')[0]
-
-                invite_to_page_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Invite " + first_name + " to like your Pages')]")
-                invite_to_page_button.click()
+                if len(title_name.text.split(' ')) > 1:
+                    second_name = title_name.text.split(' ')[1]
+                try:
+                    invite_to_page_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Invite " + first_name + " to like your Pages')]")
+                    invite_to_page_button.click()
+                except Exception as e:
+                    print(e)
+                    invite_to_page_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Invite " + first_name + " " + second_name + " to like your Pages')]")
+                    invite_to_page_button.click()
                 sleep(delay_random)
 
                 # retry_times = 0
