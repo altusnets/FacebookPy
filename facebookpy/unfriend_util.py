@@ -196,15 +196,19 @@ def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
     delay_random = random.randint(
                 ceil(sleep_delay * 0.85),
                 ceil(sleep_delay * 1.14))
+    try:
+        friend_button_elem = browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
+        ActionChains(browser).move_to_element(friend_button_elem).perform()
+        ActionChains(browser).click().perform()
+        sleep(delay_random)
 
-    friend_button_elem = browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
-    ActionChains(browser).move_to_element(friend_button_elem).perform()
-    ActionChains(browser).click().perform()
-    sleep(delay_random)
-
-    unfriend_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Unfriend')]")
-    unfriend_button.click()
-    sleep(delay_random)
+        unfriend_button = browser.find_element_by_xpath("//*[contains(text(), 'Unfriend')]")
+        unfriend_button.click()
+        sleep(delay_random)
+        return True, "success"
+    except Exception as e:
+        logger.errot(e)
+        return False, ""
 
     # retry_times = 0
     # while(retry_times < 10):
@@ -224,10 +228,10 @@ def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
     #         logger.info('unfriend.png is not yet visible. Error: {}'.format(e))
     #     retry_times = retry_times + 1
     # sleep(delay_random)
-    if retry_times < 10:
-        return True, "success"
-    else:
-        return False, ""
+    # if retry_times < 10:
+    #     return True, "success"
+    # else:
+    #     return False, ""
 
 def unfriend_user_by_url(browser, track, login, url, button, blacklist,
                 logger, logfolder, sleep_delay):

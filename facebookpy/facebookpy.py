@@ -575,10 +575,10 @@ class FacebookPy:
                                             self.logger,
                                             self.logfolder)
 
-    def unfriend_by_list(self, friendlist, pagename, sleep_delay=6):
+    def unfriend_by_list(self, friendlist, pagename, check_invite=True, sleep_delay=6):
         for acc_to_unfriend in friendlist:
-            if not self.invite_restriction("read", pagename, acc_to_unfriend, self.invite_times, self.logger):
-                self.logger.info('Not yet invited {} to page {}, so not unfriending now'.format(friend, pagename))
+            if check_invite and not self.invite_restriction("read", pagename, acc_to_unfriend, self.invite_times, self.logger):
+                self.logger.info('Not yet invited {} to page {}, so not unfriending now'.format(acc_to_unfriend, pagename))
                 continue
 
             friend_state, msg = unfriend_user(self.browser,
@@ -991,10 +991,25 @@ class FacebookPy:
                 ActionChains(self.browser).click().perform()
                 self.logger.info("{} Clicked".format(btn.text))
                 sleep(delay_random)
+                try:
+                    cancel_request_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Cancel Request')]")
+                    cancel_request_button.click()
+                    sleep(delay_random)
+                except Exception as e:
+                    self.logger.error(e)
+                    try:
+                        cancel_request_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Cancel request')]")
+                        cancel_request_button.click()
+                        sleep(delay_random)
+                    except Exception as e:
+                        self.logger.error(e)
+                        #Dummy clicking outside to close the pop menu
+                        dummy_div = self.browser.find_element_by_css_selector("div.requestInfoContainer")
+                        ActionChains(self.browser).move_to_element(dummy_div).perform()
+                        ActionChains(self.browser).click().perform()
+                        self.logger.info("{} Clicked".format(dummy_div.text))
+                        sleep(delay_random)
 
-                cancel_request_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Cancel Request')]")
-                cancel_request_button.click()
-                sleep(delay_random)
                 # retry_times = 0
                 # while(retry_times < 10):
                 #     try:
@@ -1056,8 +1071,15 @@ class FacebookPy:
 
         en_txt = self.browser.find_element_by_css_selector("#pagelet_rhc_footer > div > div.uiContextualLayerParent > div > div > div > div > span:nth-child(1)")
 
-        add_btns = self.browser.find_elements_by_css_selector("button.FriendRequestAdd.addButton")
+        add_btns = self.browser.find_elements_by_css_selector("div#browse_result_area > div#BrowseResultsContainer > div > div > div > div > div > div > div.FriendButton > button.FriendRequestAdd.addButton")
+        self.logger.info("Total buttons found {}".format(len(add_btns)))
 
+        if len(add_btns)==0:
+            add_btns = self.browser.find_elements_by_css_selector('div#BrowseResultsContainer button.FriendRequestAdd.addButton')
+            self.logger.info("Total buttons found {}".format(len(add_btns)))
+
+        if len(add_btns)==0:
+            return 0
         pending = 0
         for i, btn in enumerate(add_btns):
             try:
@@ -1080,10 +1102,16 @@ class FacebookPy:
                     added += 1
             except Exception as e:
                 self.logger.error(e)
+                msg = str(e)
+                import re
+                splited = re.split(';| |(|)|:|,|\n', msg)
+                print(splited)
+                #TODO scrollTo based on splited value
+                sleep(delay_random)
             self.browser.execute_script("window.scrollTo(0, " + str((i+1)*142) + ");")
 
         if pending > 0:
-            self.logger.info("{} pending sent outs".format(pending))
+            self.logger.info("{} pending(or already friend) sent outs".format(pending))
 
         self.logger.info("Total added so far: {}".format(added))
 
