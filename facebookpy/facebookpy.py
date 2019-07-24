@@ -448,6 +448,8 @@ class FacebookPy:
                       sleep_delay=600,
                       interact=False):
         """ Follows users' likers """
+
+        self.logger.info("About to follow following: {}".format(userids))
         if self.aborting:
             return self
 
@@ -565,6 +567,7 @@ class FacebookPy:
 
     def friend_by_list(self, friendlist, times=1, sleep_delay=600,
                        interact=False):
+        self.logger.info("About to friend following: {}".format(friendlist))
         for acc_to_friend in friendlist:
             friend_state, msg = friend_user(self.browser,
                                             "profile",
@@ -576,6 +579,7 @@ class FacebookPy:
                                             self.logfolder)
 
     def unfriend_by_list(self, friendlist, pagename, check_invite=True, sleep_delay=6):
+        self.logger.info("About to unfriend following: {}".format(friendlist))
         for acc_to_unfriend in friendlist:
             if check_invite and not self.invite_restriction("read", pagename, acc_to_unfriend, self.invite_times, self.logger):
                 self.logger.info('Not yet invited {} to page {}, so not unfriending now'.format(acc_to_unfriend, pagename))
@@ -592,6 +596,7 @@ class FacebookPy:
                                             sleep_delay=sleep_delay)
 
     def unfriend_by_urllist(self, urllist, sleep_delay=6):
+        self.logger.info("About to unfriend following: {}".format(urllist))
         for url in urllist:
             friend_state, msg = unfriend_user_by_url(self.browser,
                                             "profile",
@@ -606,6 +611,7 @@ class FacebookPy:
     def follow_by_list(self, followlist, times=1, sleep_delay=600,
                        interact=False):
         """Allows to follow by any scrapped list"""
+        self.logger.info("About to follow following: {}".format(followlist))
         if not isinstance(followlist, list):
             followlist = [followlist]
 
@@ -977,6 +983,7 @@ class FacebookPy:
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
+        self.logger.info("withdrawing outgoing friends requests")
         self.browser.get("https://www.facebook.com/friends/requests/?fcref=ft&outgoing=1")
         sent_btns = self.browser.find_elements_by_css_selector("button.FriendRequestOutgoing.outgoingButton")
         self.logger.info("Total outgoing: {}".format(len(sent_btns)))
@@ -1035,6 +1042,7 @@ class FacebookPy:
         return likers_buttons
 
     def add_likers_from_term(self, search_term):
+        self.logger.info("About to add_likers_from_term: {}".format(search_term))
         search_url = "https://www.facebook.com/search/pages/?q=" + search_term + "&epa=SERP_TAB"
         self.browser.get(search_url)
         for i in range(10):
@@ -1063,20 +1071,21 @@ class FacebookPy:
                 self.logger.error(e)
 
     def add_likers_of_page(self, page_likers_url, added, sleep_delay=6):
+        self.logger.info("About to add_likers_of_page: {}".format(page_likers_url))
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
         self.browser.get(page_likers_url)
-        self.logger.info("Visiting : {}".format(page_likers_url))
+        self.logger.info("Visiting to add likers of page: {}".format(page_likers_url))
 
         en_txt = self.browser.find_element_by_css_selector("#pagelet_rhc_footer > div > div.uiContextualLayerParent > div > div > div > div > span:nth-child(1)")
 
         add_btns = self.browser.find_elements_by_css_selector("div#browse_result_area > div#BrowseResultsContainer > div > div > div > div > div > div > div.FriendButton > button.FriendRequestAdd.addButton")
-        self.logger.info("Total buttons found {}".format(len(add_btns)))
+        self.logger.info("Total add friend buttons found {}".format(len(add_btns)))
 
         if len(add_btns)==0:
             add_btns = self.browser.find_elements_by_css_selector('div#BrowseResultsContainer button.FriendRequestAdd.addButton')
-            self.logger.info("Total buttons found {}".format(len(add_btns)))
+            self.logger.info("Total add friend buttons found {}".format(len(add_btns)))
 
         if len(add_btns)==0:
             return 0
@@ -1087,16 +1096,16 @@ class FacebookPy:
                     pending += 1
                     continue
                 before_text = btn.text
-                self.logger.info("{} <=before clicking".format(before_text))
+                self.logger.info("{} <= before clicking".format(before_text))
                 ActionChains(self.browser).move_to_element(btn).perform()
                 ActionChains(self.browser).click().perform()
-                self.logger.info("{} <=Clicked".format(btn.text))
+                self.logger.info("{} <= after Clicking".format(btn.text))
                 sleep(delay_random)
 
                 #Dummy clicking outside to close the pop menu
                 ActionChains(self.browser).move_to_element(en_txt).perform()
                 ActionChains(self.browser).click().perform()
-                self.logger.info("{} Clicked".format(en_txt.text))
+                self.logger.info("{} Clicked (dummy click)".format(en_txt.text))
                 sleep(delay_random)
                 if before_text != btn.text:
                     added += 1
@@ -1108,19 +1117,21 @@ class FacebookPy:
                 print(splited)
                 #TODO scrollTo based on splited value
                 sleep(delay_random)
+            self.logger.info("========")
             self.browser.execute_script("window.scrollTo(0, " + str((i+1)*142) + ");")
 
         if pending > 0:
             self.logger.info("{} pending(or already friend) sent outs".format(pending))
 
-        self.logger.info("Total added so far: {}".format(added))
-
+        self.logger.info("Total friends added so far: {}".format(added))
+        self.logger.info("====End of add_likers_of_page===")
         return added
 
     def invite_friends_to_page(self, friendslist, pagename, sleep_delay=6):
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
+        self.logger.info("====Start invite_friends_to_page===")
         net_invited_friends = []
         for friend in friendslist:
             try:
@@ -1184,6 +1195,7 @@ class FacebookPy:
                         sleep(delay_random)
             except Exception as e:
                 self.logger.error("Failed for friend {} with error {}".format(friend, e))
+        self.logger.info("====End of invite_friends_to_page===")
         return net_invited_friends
 
     def interact_by_users(self,

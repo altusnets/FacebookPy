@@ -6,6 +6,7 @@ from facebookpy import smart_run
 from socialcommons.file_manager import set_workspace
 from facebookpy import settings
 import pprint as pp
+import random
 
 # set workspace folder at desired location (default is at your home folder)
 set_workspace(settings.Settings, path=None)
