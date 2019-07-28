@@ -4,11 +4,7 @@
 # The following is an example of a cron scheduled every 10 mins
 # */10 * * * * bash /path/to/FacebookPy/run_facebookpy_only_once_for_mac.sh /path/to/FacebookPy/quickstart.py $USERNAME $PASSWORD $USERID
 
-/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "Sublime Text")) whose role description is "minimize button")'
-/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "Finder")) whose role description is "minimize button")'
-/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "System Preferences")) whose role description is "minimize button")'
-/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "Terminal")) whose role description is "minimize button")'
-/usr/bin/osascript -e 'tell application "System Events" to click (first button of (every window of (application process "Safari")) whose role description is "minimize button")'
+/usr/bin/osascript -e 'tell application "System Events" to keystroke "hm" using {command down, option down}'
 
 TEMPLATE_PATH=$1
 USERNAME=$2

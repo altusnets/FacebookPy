@@ -124,11 +124,12 @@ def friend_user(browser, track, login, userid_to_friend, times, blacklist,
 
     # check URL of the webpage, if it already is user's profile
     # page, then do not navigate to it again
-    user_link = "https://www.facebook.com/{}/".format(userid_to_friend)
-    web_address_navigator( browser, user_link, Settings)
     if friend_restriction("read", userid_to_friend, 1, logger):
         logger.info("Already connected {} or more times".format(times))
-        return
+        return False, "already friended"
+
+    user_link = "https://www.facebook.com/{}/".format(userid_to_friend)
+    web_address_navigator( browser, user_link, Settings)
 
     # find out CURRENT friending status
     friending_status, friend_button = \
@@ -164,12 +165,9 @@ def friend_user(browser, track, login, userid_to_friend, times, blacklist,
     logger.info("--> Friended '{}'!".format(userid_to_friend.encode("utf-8")))
     update_activity(Settings, 'friendeds')
 
-    # get user ID to record alongside username
-    user_id = get_user_id(browser, track, userid_to_friend, logger)
-
     logtime = datetime.now().strftime('%Y-%m-%d %H:%M')
     log_friended_pool(login, userid_to_friend, logger,
-                      logfolder, logtime, user_id)
+                      logfolder, logtime, userid_to_friend)
 
     friend_restriction("write", userid_to_friend, None, logger)
 

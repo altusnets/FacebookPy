@@ -9,6 +9,7 @@ __pycache__/
 
 quickstart.py
 pl.py
+pl2.py
 docker_quickstart.py
 
 # C extensions

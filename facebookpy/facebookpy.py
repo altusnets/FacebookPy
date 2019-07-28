@@ -148,6 +148,10 @@ class FacebookPy:
         self.unfollowed = 0
         self.followed_by = 0
         self.following_num = 0
+        self.friended = 0
+        self.unfriended = 0
+        self.invited = 0
+        self.already_invited = 0
         self.inap_img = 0
         self.not_valid_users = 0
         self.video_played = 0
@@ -594,6 +598,8 @@ class FacebookPy:
                                             self.logger,
                                             self.logfolder,
                                             sleep_delay=sleep_delay)
+            if friend_state:
+                self.unfriended += 1
 
     def unfriend_by_urllist(self, urllist, sleep_delay=6):
         self.logger.info("About to unfriend following: {}".format(urllist))
@@ -607,7 +613,8 @@ class FacebookPy:
                                             self.logger,
                                             self.logfolder,
                                             sleep_delay=sleep_delay)
-
+            if friend_state:
+                self.unfriended += 1
     def follow_by_list(self, followlist, times=1, sleep_delay=600,
                        interact=False):
         """Allows to follow by any scrapped list"""
@@ -696,6 +703,9 @@ class FacebookPy:
                                                 self.blacklist,
                                                 self.logger,
                                                 self.logfolder, Settings)
+                if follow_state:
+                    self.followed += 1
+
                 sleep(random.randint(1, 3))
 
                 if follow_state is True:
@@ -946,6 +956,8 @@ class FacebookPy:
                         self.logger.error(e)
                     self.logger.info("Clicked {}".format(confirm_button.text))
                     adds += 1
+                    if friend_state:
+                        self.friended += 1
                     self.logger.info("Add Friends sent in this iteration: {}".format(adds))
                     if adds >= max_confirms:
                         self.logger.info("max Add Friends ({}) for this iteration reached , Returning...".format(max_confirms))
@@ -1060,6 +1072,7 @@ class FacebookPy:
                     links.append(link)
                     if added < 20:
                         added = self.add_likers_of_page(link, added=added)
+                        self.friended += added
                         sleep(1)
                         self.browser.execute_script("window.history.go(-1)")
                         sleep(1)
@@ -1070,7 +1083,83 @@ class FacebookPy:
             except Exception as e:
                 self.logger.error(e)
 
-    def add_likers_of_page(self, page_likers_url, added, sleep_delay=6):
+    def add_members_of_group(self, group_id, added=0, sleep_delay=6):
+        self.logger.info("About to add_likers_of_page: {}".format(group_id))
+        delay_random = random.randint(
+                    ceil(sleep_delay * 0.85),
+                    ceil(sleep_delay * 1.14))
+        group_members_url = "https://www.facebook.com/groups/{}/members_with_things_in_common/".format(group_id)
+        self.browser.get(group_members_url)
+        self.logger.info("Visiting to add members of group: {}".format(group_id))
+
+        en_txt = self.browser.find_element_by_css_selector("#pagelet_rhc_footer > div > div.uiContextualLayerParent > div > div > div > div > span:nth-child(1)")
+
+        for i in range(20):
+            self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            sleep(delay_random)
+
+        selector = "div[id^='things_in_common_']"
+        rows = self.browser.find_elements_by_css_selector(selector)
+        self.logger.info("Total rows found {}".format(len(rows)))
+
+        pending = 0
+        useful_userids = []
+        useless_ids = 0
+        failed_parsing = 0
+        for row in rows:
+            try:
+                btn = row.find_element_by_css_selector("div.FriendButton > button.FriendRequestAdd.addButton")
+
+                before_text = btn.text.strip()
+                if before_text!='Add Friend':
+                    pending += 1
+                    continue
+
+                if 'hidden_elem' in btn.get_attribute('class'):
+                    pending += 1
+                    continue
+
+                prof_link = row.find_element_by_css_selector("a")
+                userid = prof_link.get_attribute('href').split('?')[0].split('/')[3]
+                if userid=='profile.php':
+                    useless_ids += 1
+                    continue
+                useful_userids.append(userid)
+            except Exception as e:
+                failed_parsing += 1
+                self.logger.error(e)
+                sleep(delay_random)
+            self.logger.info("===== pending:{} === failed_parsing:{} === useless_ids:{} === collected for adding:{} =====".format(pending, failed_parsing, useless_ids, len(useful_userids)))
+
+        failed_adding = 0
+        for userid in useful_userids:
+            try:
+                friend_state, msg = friend_user(self.browser,
+                                "profile",
+                                self.username,
+                                userid,
+                                self.friend_times,
+                                self.blacklist,
+                                self.logger,
+                                self.logfolder)
+                if friend_state:
+                    added += 1
+                else:
+                    failed_adding += 1
+            except Exception as e:
+                failed_adding += 1
+                self.logger.error(userid, e)
+                sleep(delay_random)
+            self.logger.info("===== pending:{} === failed_adding(or already friend):{} === useless_ids:{} === added:{}/{} =====".format(pending, failed_adding, useless_ids, added, len(useful_userids)))
+
+        if pending > 0:
+            self.logger.info("{} pending(or already friend) sent outs".format(pending))
+
+        self.logger.info("Total friends added so far: {}".format(added))
+        self.logger.info("====End of add_likers_of_page===")
+        return added
+
+    def add_likers_of_page(self, page_likers_url, added=0, sleep_delay=6):
         self.logger.info("About to add_likers_of_page: {}".format(page_likers_url))
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
@@ -1138,6 +1227,7 @@ class FacebookPy:
                 if self.invite_restriction("read", pagename, friend, self.invite_times, self.logger):
                     self.logger.info('Already invited {} to page {}, {} times'.format(friend, pagename, self.invite_times))
                     net_invited_friends.append(friend)
+                    self.already_invited += 1
                     continue
                 self.logger.info("Visiting {}".format(friend))
                 self.browser.get("https://www.facebook.com/{}".format(friend))
@@ -1185,12 +1275,14 @@ class FacebookPy:
                     if button_elem.text == 'Invited':
                         self.logger.info('Already invited: {}'.format(friend))
                         net_invited_friends.append(friend)
+                        self.already_invited += 1
                         self.invite_restriction("write", pagename, friend, None, self.logger)
                     else:
                         ActionChains(self.browser).move_to_element(button_elem).perform()
                         ActionChains(self.browser).click().perform()
                         self.logger.info('~---> Just invited: {}'.format(friend))
                         net_invited_friends.append(friend)
+                        self.invited += 1
                         self.invite_restriction("write", pagename, friend, None, self.logger)
                         sleep(delay_random)
             except Exception as e:
@@ -1751,6 +1843,9 @@ class FacebookPy:
                 "\t|> COMMENTED on {} images\n"
                 "\t|> FOLLOWED {} users  |  ALREADY FOLLOWED: {}\n"
                 "\t|> UNFOLLOWED {} users\n"
+                "\t|> FRIENDED {} users\n"
+                "\t|> UNFRIENDED {} users\n"
+                "\t|> INVITED to Pages: {}  |  ALREADY INVITED: {}\n"
                 "\t|> LIKED {} comments\n"
                 "\t|> REPLIED to {} comments\n"
                 "\t|> INAPPROPRIATE images: {}\n"
@@ -1762,6 +1857,10 @@ class FacebookPy:
                         self.followed,
                         self.already_followed,
                         self.unfollowed,
+                        self.friended,
+                        self.unfriended,
+                        self.invited,
+                        self.already_invited,
                         self.liked_comments,
                         self.replied_to_comments,
                         self.inap_img,

@@ -64,8 +64,9 @@ session = FacebookPy(username="abc",
   * [Confirm friends received](confirm-friends-received)
   * [Add suggested friends](Add-suggested-friends)
   * [Quota Supervisor](#quota-supervisor)
-  * [Get recent friends](#get-recent-friends):
-  * [Invite friends to page](#invite-friends-to-page) 
+  * [Get recent friends](#get-recent-friends)
+  * [Invite friends to page](#invite-friends-to-page)
+  * [Add members of group](#add-members-of-group)
   * [Add likers from term](#add-likers-from-term)
   * [Withdraw outgoing friends requests](#withdraw-outgoing-friends-requests)
 
@@ -208,13 +209,23 @@ session.set_do_follow(enabled=True, percentage=10, times=2)
 
 Confirm all the friends requests recieved.
 
+```python
     session.confirm_friends()
+```
+
+### Add members of group
+
+```python
+    session.add_members_of_group(group_id="941808466025179")
+```
 
 ### add suggested friends?
 
 From friends suggested by facebook add top few
 
+```python
     session.add_suggested_friends()
+```
 
 ```python
 session.set_do_follow(enabled=True, percentage=10, times=2)
