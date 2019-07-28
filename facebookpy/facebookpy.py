@@ -1057,14 +1057,17 @@ class FacebookPy:
         self.logger.info("About to add_likers_from_term: {}".format(search_term))
         search_url = "https://www.facebook.com/search/pages/?q=" + search_term + "&epa=SERP_TAB"
         self.browser.get(search_url)
-        for i in range(10):
+        for i in range(20):
             self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         likers_buttons = self.refresh_links()
         sleep(2)
         links = []
         added = 0
-        for i in range(len(likers_buttons)):
+        l = list(range(len(likers_buttons)))
+        random.shuffle(l)
+        self.logger.info("Will explore pages in following order of index: {}".format(l))
+        for i in l:
             try:
                 likers_button = likers_buttons[i]
                 link = likers_button.get_attribute('href')
@@ -1083,25 +1086,10 @@ class FacebookPy:
             except Exception as e:
                 self.logger.error(e)
 
-    def add_members_of_group(self, group_id, added=0, sleep_delay=6):
-        self.logger.info("About to add_likers_of_page: {}".format(group_id))
+    def process_rows_and_add_by_visiting(self, rows, added=0, sleep_delay=6):
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
-        group_members_url = "https://www.facebook.com/groups/{}/members_with_things_in_common/".format(group_id)
-        self.browser.get(group_members_url)
-        self.logger.info("Visiting to add members of group: {}".format(group_id))
-
-        en_txt = self.browser.find_element_by_css_selector("#pagelet_rhc_footer > div > div.uiContextualLayerParent > div > div > div > div > span:nth-child(1)")
-
-        for i in range(20):
-            self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            sleep(delay_random)
-
-        selector = "div[id^='things_in_common_']"
-        rows = self.browser.find_elements_by_css_selector(selector)
-        self.logger.info("Total rows found {}".format(len(rows)))
-
         pending = 0
         useful_userids = []
         useless_ids = 0
@@ -1125,10 +1113,10 @@ class FacebookPy:
                     useless_ids += 1
                     continue
                 useful_userids.append(userid)
+                sleep(delay_random)
             except Exception as e:
                 failed_parsing += 1
                 self.logger.error(e)
-                sleep(delay_random)
             self.logger.info("===== pending:{} === failed_parsing:{} === useless_ids:{} === collected for adding:{} =====".format(pending, failed_parsing, useless_ids, len(useful_userids)))
 
         failed_adding = 0
@@ -1156,6 +1144,26 @@ class FacebookPy:
             self.logger.info("{} pending(or already friend) sent outs".format(pending))
 
         self.logger.info("Total friends added so far: {}".format(added))
+
+    def add_members_of_group(self, group_id, added=0, sleep_delay=6):
+        self.logger.info("About to add_likers_of_page: {}".format(group_id))
+        delay_random = random.randint(
+                    ceil(sleep_delay * 0.85),
+                    ceil(sleep_delay * 1.14))
+        group_members_url = "https://www.facebook.com/groups/{}/members_with_things_in_common/".format(group_id)
+        self.browser.get(group_members_url)
+        self.logger.info("Visiting to add members of group: {}".format(group_id))
+
+        en_txt = self.browser.find_element_by_css_selector("#pagelet_rhc_footer > div > div.uiContextualLayerParent > div > div > div > div > span:nth-child(1)")
+
+        for i in range(20):
+            self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            sleep(delay_random)
+
+        selector = "div[id^='things_in_common_']"
+        rows = self.browser.find_elements_by_css_selector(selector)
+        self.logger.info("Total rows found {}".format(len(rows)))
+        added = self.process_rows_and_add_by_visiting(rows, added, sleep_delay)
         self.logger.info("====End of add_likers_of_page===")
         return added
 
@@ -1169,52 +1177,62 @@ class FacebookPy:
 
         en_txt = self.browser.find_element_by_css_selector("#pagelet_rhc_footer > div > div.uiContextualLayerParent > div > div > div > div > span:nth-child(1)")
 
-        add_btns = self.browser.find_elements_by_css_selector("div#browse_result_area > div#BrowseResultsContainer > div > div > div > div > div > div > div.FriendButton > button.FriendRequestAdd.addButton")
-        self.logger.info("Total add friend buttons found {}".format(len(add_btns)))
+        for i in range(20):
+            self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            sleep(delay_random)
 
-        if len(add_btns)==0:
-            add_btns = self.browser.find_elements_by_css_selector('div#BrowseResultsContainer button.FriendRequestAdd.addButton')
-            self.logger.info("Total add friend buttons found {}".format(len(add_btns)))
-
-        if len(add_btns)==0:
-            return 0
-        pending = 0
-        for i, btn in enumerate(add_btns):
-            try:
-                if 'hidden_elem' in btn.get_attribute('class'):
-                    pending += 1
-                    continue
-                before_text = btn.text
-                self.logger.info("{} <= before clicking".format(before_text))
-                ActionChains(self.browser).move_to_element(btn).perform()
-                ActionChains(self.browser).click().perform()
-                self.logger.info("{} <= after Clicking".format(btn.text))
-                sleep(delay_random)
-
-                #Dummy clicking outside to close the pop menu
-                ActionChains(self.browser).move_to_element(en_txt).perform()
-                ActionChains(self.browser).click().perform()
-                self.logger.info("{} Clicked (dummy click)".format(en_txt.text))
-                sleep(delay_random)
-                if before_text != btn.text:
-                    added += 1
-            except Exception as e:
-                self.logger.error(e)
-                msg = str(e)
-                import re
-                splited = re.split(';| |(|)|:|,|\n', msg)
-                print(splited)
-                #TODO scrollTo based on splited value
-                sleep(delay_random)
-            self.logger.info("========")
-            self.browser.execute_script("window.scrollTo(0, " + str((i+1)*142) + ");")
-
-        if pending > 0:
-            self.logger.info("{} pending(or already friend) sent outs".format(pending))
-
-        self.logger.info("Total friends added so far: {}".format(added))
+        selector = 'div[data-testid*=results] > div'
+        rows = self.browser.find_elements_by_css_selector(selector)
+        self.logger.info("Total rows found {}".format(len(rows)))
+        added = self.process_rows_and_add_by_visiting(rows, added, sleep_delay)
         self.logger.info("====End of add_likers_of_page===")
         return added
+
+    # def inline_adding(self):
+    #     add_btns = self.browser.find_elements_by_css_selector("div#browse_result_area > div#BrowseResultsContainer > div > div > div > div > div > div > div.FriendButton > button.FriendRequestAdd.addButton")
+    #     self.logger.info("Total add friend buttons found {}".format(len(add_btns)))
+
+    #     if len(add_btns)==0:
+    #         add_btns = self.browser.find_elements_by_css_selector('div#BrowseResultsContainer button.FriendRequestAdd.addButton')
+    #         self.logger.info("Total add friend buttons found {}".format(len(add_btns)))
+
+    #     if len(add_btns)==0:
+    #         return 0
+    #     pending = 0
+    #     for i, btn in enumerate(add_btns):
+    #         try:
+    #             if 'hidden_elem' in btn.get_attribute('class'):
+    #                 pending += 1
+    #                 continue
+    #             before_text = btn.text
+    #             self.logger.info("{} <= before clicking".format(before_text))
+    #             ActionChains(self.browser).move_to_element(btn).perform()
+    #             ActionChains(self.browser).click().perform()
+    #             self.logger.info("{} <= after Clicking".format(btn.text))
+    #             sleep(delay_random)
+
+    #             #Dummy clicking outside to close the pop menu
+    #             ActionChains(self.browser).move_to_element(en_txt).perform()
+    #             ActionChains(self.browser).click().perform()
+    #             self.logger.info("{} Clicked (dummy click)".format(en_txt.text))
+    #             sleep(delay_random)
+    #             if before_text != btn.text:
+    #                 added += 1
+    #         except Exception as e:
+    #             self.logger.error(e)
+    #             msg = str(e)
+    #             import re
+    #             splited = re.split(';| |(|)|:|,|\n', msg)
+    #             print(splited)
+    #             #TODO scrollTo based on splited value
+    #             sleep(delay_random)
+    #         self.logger.info("========")
+    #         self.browser.execute_script("window.scrollTo(0, " + str((i+1)*142) + ");")
+
+    #     if pending > 0:
+    #         self.logger.info("{} pending(or already friend) sent outs".format(pending))
+
+    #     self.logger.info("Total friends added so far: {}".format(added))
 
     def invite_friends_to_page(self, friendslist, pagename, sleep_delay=6):
         delay_random = random.randint(
