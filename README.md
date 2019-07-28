@@ -29,12 +29,9 @@ python quickstart.py --username abc@gmail.com --userid abc.pqr --password 123
 > **PRO**:
 > Read about difference between username and userid for facebook: https://www.facebook.com/help/211813265517027?helpref=faq_content
 
-> **PRO**:
-> Read more about passing arguments from the command line interface in the section - [Pass arguments by CLI](#pass-arguments-by-cli).
-
 <br />
 
-##### 🚁 You can provide _username_ & _password_ inside the **quickstart** script, too!
+##### You can provide _username_ & _password_ inside the **quickstart** script, too!
 
 ```python
 # inside quickstart script
@@ -225,10 +222,6 @@ From friends suggested by facebook add top few
 
 ```python
     session.add_suggested_friends()
-```
-
-```python
-session.set_do_follow(enabled=True, percentage=10, times=2)
 ```
 
 ### Bypass Suspicious Login Attempt
