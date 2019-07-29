@@ -992,6 +992,7 @@ class FacebookPy:
         return friend_urls
 
     def withdraw_outgoing_friends_requests(self, ignore_few=True, sleep_delay=6):
+        self.logger.info("====Start withdraw_outgoing_friends_requests===")
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
@@ -1002,7 +1003,7 @@ class FacebookPy:
         if ignore_few and len(sent_btns) < 10:
             self.logger.info("Too few outgoing, hence returning")
             return
-        for btn in sent_btns:
+        for i, btn in enumerate(sent_btns):
             try:
                 if 'hidden_elem' in btn.get_attribute('class'):
                     continue
@@ -1047,6 +1048,8 @@ class FacebookPy:
                 #     retry_times = retry_times + 1
             except Exception as e:
                 self.logger.error(e)
+                self.browser.execute_script("window.scrollTo(0, " + str((i+1)*142) + ");")
+        self.logger.info("====End of withdraw_outgoing_friends_requests===")
 
     def refresh_links(self):
         likers_buttons = self.browser.find_elements_by_css_selector("div > div._4bl9 > div > div:nth-child(2) > div._glm > div > a")
@@ -1086,7 +1089,7 @@ class FacebookPy:
             except Exception as e:
                 self.logger.error(e)
 
-    def process_rows_and_add_by_visiting(self, rows, added=0, sleep_delay=6):
+    def process_rows_and_add_by_visiting(self, rows, added=0, max_add=50, sleep_delay=6):
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
@@ -1118,6 +1121,9 @@ class FacebookPy:
                 failed_parsing += 1
                 self.logger.error(e)
             self.logger.info("===== pending:{} === failed_parsing:{} === useless_ids:{} === collected for adding:{} =====".format(pending, failed_parsing, useless_ids, len(useful_userids)))
+            if len(useful_userids) >= max_add:
+                self.logger.info("Too many users for now, let's process")
+                break
 
         failed_adding = 0
         for userid in useful_userids:
@@ -1145,8 +1151,8 @@ class FacebookPy:
 
         self.logger.info("Total friends added so far: {}".format(added))
 
-    def add_members_of_group(self, group_id, added=0, sleep_delay=6):
-        self.logger.info("About to add_likers_of_page: {}".format(group_id))
+    def add_members_of_group(self, group_id, added=0, max_add=50, sleep_delay=6):
+        self.logger.info("About to add_members_of_group: {}".format(group_id))
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
@@ -1163,11 +1169,11 @@ class FacebookPy:
         selector = "div[id^='things_in_common_']"
         rows = self.browser.find_elements_by_css_selector(selector)
         self.logger.info("Total rows found {}".format(len(rows)))
-        added = self.process_rows_and_add_by_visiting(rows, added, sleep_delay)
-        self.logger.info("====End of add_likers_of_page===")
+        added = self.process_rows_and_add_by_visiting(rows=rows, added=added, max_add=max_add, sleep_delay=sleep_delay)
+        self.logger.info("====End of add_members_of_group===")
         return added
 
-    def add_likers_of_page(self, page_likers_url, added=0, sleep_delay=6):
+    def add_likers_of_page(self, page_likers_url, added=0, max_add=50, sleep_delay=6):
         self.logger.info("About to add_likers_of_page: {}".format(page_likers_url))
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
@@ -1184,7 +1190,7 @@ class FacebookPy:
         selector = 'div[data-testid*=results] > div'
         rows = self.browser.find_elements_by_css_selector(selector)
         self.logger.info("Total rows found {}".format(len(rows)))
-        added = self.process_rows_and_add_by_visiting(rows, added, sleep_delay)
+        added = self.process_rows_and_add_by_visiting(rows=rows, added=added, max_add=max_add, sleep_delay=sleep_delay)
         self.logger.info("====End of add_likers_of_page===")
         return added
 
@@ -1235,10 +1241,10 @@ class FacebookPy:
     #     self.logger.info("Total friends added so far: {}".format(added))
 
     def invite_friends_to_page(self, friendslist, pagename, sleep_delay=6):
+        self.logger.info("====Start invite_friends_to_page===")
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
-        self.logger.info("====Start invite_friends_to_page===")
         net_invited_friends = []
         for friend in friendslist:
             try:
