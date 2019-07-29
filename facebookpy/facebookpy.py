@@ -571,6 +571,7 @@ class FacebookPy:
 
     def friend_by_list(self, friendlist, times=1, sleep_delay=600,
                        interact=False):
+        self.logger.info("====Start friend_by_list===")
         self.logger.info("About to friend following: {}".format(friendlist))
         for acc_to_friend in friendlist:
             friend_state, msg = friend_user(self.browser,
@@ -581,8 +582,10 @@ class FacebookPy:
                                             self.blacklist,
                                             self.logger,
                                             self.logfolder)
+        self.logger.info("====End of friend_by_list===")
 
     def unfriend_by_list(self, friendlist, pagename, check_invite=True, sleep_delay=6):
+        self.logger.info("====Start unfriend_by_list===")
         self.logger.info("About to unfriend following: {}".format(friendlist))
         for acc_to_unfriend in friendlist:
             if check_invite and not self.invite_restriction("read", pagename, acc_to_unfriend, self.invite_times, self.logger):
@@ -600,8 +603,10 @@ class FacebookPy:
                                             sleep_delay=sleep_delay)
             if friend_state:
                 self.unfriended += 1
+        self.logger.info("====End of unfriend_by_list===")
 
     def unfriend_by_urllist(self, urllist, sleep_delay=6):
+        self.logger.info("====Start unfriend_by_urllist===")
         self.logger.info("About to unfriend following: {}".format(urllist))
         for url in urllist:
             friend_state, msg = unfriend_user_by_url(self.browser,
@@ -615,9 +620,12 @@ class FacebookPy:
                                             sleep_delay=sleep_delay)
             if friend_state:
                 self.unfriended += 1
+        self.logger.info("====End of unfriend_by_urllist===")
+
     def follow_by_list(self, followlist, times=1, sleep_delay=600,
                        interact=False):
         """Allows to follow by any scrapped list"""
+        self.logger.info("====Start follow_by_list===")
         self.logger.info("About to follow following: {}".format(followlist))
         if not isinstance(followlist, list):
             followlist = [followlist]
@@ -774,6 +782,7 @@ class FacebookPy:
         self.followed += followed_all
         self.already_followed += already_followed
         self.not_valid_users += not_valid_users
+        self.logger.info("====End of follow_by_list===")
 
         return followed_all
 
