@@ -152,11 +152,6 @@ For example, if one needs to get followbacks from followers of a chosen account/
     session.follow_likers(['user1' , 'user2'], photos_grab_amount = 2, follow_likers_per_photo = 3, randomize=True, sleep_delay=600, interact=False)
 ```
 
-```python
-    session.set_user_interact(amount=2, percentage=70, randomize=True, media='Photo')
-    session.follow_likers(['user1' , 'user2'], photos_grab_amount = 2, follow_likers_per_photo = 3, randomize=True, sleep_delay=600, interact=True)
-```
-
 ### Friending
 
 ```python
