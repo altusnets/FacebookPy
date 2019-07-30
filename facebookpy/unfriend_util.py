@@ -171,18 +171,6 @@ def friend_user(browser, track, login, userid_to_friend, times, blacklist,
 
     friend_restriction("write", userid_to_friend, None, logger)
 
-    # if blacklist['enabled'] is True:
-    #     action = 'friendeds'
-    #     add_user_to_blacklist(userid_to_friend,
-    #                           blacklist['campaign'],
-    #                           action,
-    #                           logger,
-    #                           logfolder)
-
-    # # get the post-friend delay time to sleep
-    # naply = get_action_delay("friend")
-    # sleep(naply)
-
     return True, "success"
 
 def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
@@ -206,31 +194,8 @@ def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
         sleep(delay_random)
         return True, "success"
     except Exception as e:
-        logger.error("Failed to unfriend {} , with error {}".format(userid_to_unfriend, e))
+        logger.error("Failed to unfriend {}, with error {}".format(userid_to_unfriend, e))
         return False, ""
-
-    # retry_times = 0
-    # while(retry_times < 10):
-    #     try:
-    #         sleep(delay_random)
-    #         dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/unfriend.png', grayscale=True, confidence=.6)
-    #         logger.info("unfriend.png is Visible, lets click it")
-    #         pyautogui.moveTo(dropx, dropy)
-    #         sleep(delay_random)
-    #         pyautogui.click()
-    #         pyautogui.doubleClick()
-    #         sleep(delay_random)
-    #         logger.info("unfriend.png Clicked")
-    #         friend_restriction("write", userid_to_unfriend, None, logger)
-    #         break
-    #     except Exception as e:
-    #         logger.info('unfriend.png is not yet visible. Error: {}'.format(e))
-    #     retry_times = retry_times + 1
-    # sleep(delay_random)
-    # if retry_times < 10:
-    #     return True, "success"
-    # else:
-    #     return False, ""
 
 def unfriend_user_by_url(browser, track, login, url, button, blacklist,
                 logger, logfolder, sleep_delay):
