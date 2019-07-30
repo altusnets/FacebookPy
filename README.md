@@ -10,19 +10,17 @@
 It is recomended to use via pyenv
 We will be supporting python 3.6.0 and above going forward
 
-```
+```bash
 curl https://pyenv.run | bash
 curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
 pyenv install 3.6.0
 pyenv local 3.6.0
 pip install -r requirements.txt
 ```
-
 <br />
 
 Now all you need is a **quickstart** script into your computer, go ahead and run it in the command prompt as:
-
-```elm
+```bash
 python quickstart.py --username abc@gmail.com --userid abc.pqr --password 123
 ```
 
@@ -34,12 +32,8 @@ python quickstart.py --username abc@gmail.com --userid abc.pqr --password 123
 ##### You can provide _username_ & _password_ inside the **quickstart** script, too!
 
 ```python
-# inside quickstart script
-
-session = FacebookPy(username="abc",
-                  password="123")
+session = FacebookPy(username="abc", password="123")
 ```
-
 <br />
 
 # Documentation
