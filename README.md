@@ -75,38 +75,30 @@ session = FacebookPy(username="abc", password="123")
 ### Following
 
 ```python
-# default enabled=False, follows ~ 10% of the users from the images, times=1
-# (only follows a user once (if unfollowed again))
-
-session.set_do_follow(enabled=True, percentage=10, times=2)
+    session.set_do_follow(enabled=True, percentage=10, times=2)
 ```
 ### Restricting Likes
 
 ```python
-session.set_dont_like(['#exactmatch', '[startswith', ']endswith', 'broadmatch'])
+    session.set_dont_like(['#exactmatch', '[startswith', ']endswith', 'broadmatch'])
 ```
 
 ### Ignoring Users
 
 ```python
-# completely ignore liking images from certain users
-
-session.set_ignore_users(['random_user', 'another_username'])
+    session.set_ignore_users(['random_user', 'another_username'])
 ```
 
 ### Excluding friends
 
 ```python
-# will prevent commenting on and unfollowing your good friends (the images will
-# still be liked)
-
-session.set_dont_include(['friend1', 'friend2', 'friend3'])
+    session.set_dont_include(['friend1', 'friend2', 'friend3'])
 ```
 
 ### Quota Supervisor
 
 ```python
-  session.set_quota_supervisor(
+    session.set_quota_supervisor(
                       Settings, enabled=True,
                       sleep_after=["likes", "comments_d", "follows", "unfollows", "server_calls_h"],
                       sleepyhead=True,
@@ -124,7 +116,7 @@ session.set_dont_include(['friend1', 'friend2', 'friend3'])
 ##### This will follow each account from a list of facebook nicknames
 
 ```python
-follow_by_list(followlist=['samantha3', 'larry_ok'], times=1, sleep_delay=600, interact=False)
+    follow_by_list(followlist=['samantha3', 'larry_ok'], times=1, sleep_delay=600, interact=False)
 ```
 
 _only follows a user once (if unfollowed again) would be useful for the precise targeting_  
@@ -132,34 +124,22 @@ _only follows a user once (if unfollowed again) would be useful for the precise 
 For example, if one needs to get followbacks from followers of a chosen account/group of accounts.
 
 ```python
-accs = ['therock','natgeo']
-session.follow_by_list(accs, times=1, sleep_delay=600, interact=False)
+    accs = ['therock','natgeo']
+    session.follow_by_list(accs, times=1, sleep_delay=600, interact=False)
 ```
 
-* You can also **interact** with the followed users by enabling `interact=True` which will use the configuration of `set_user_interact` setting:  
+* You can also **interact** with the followed users by enabling `interact=True` which will use the configuration of `set_user_interact` setting:
 
 ```python
-session.set_user_interact(amount=4,
-                 percentage=50,
-                  randomize=True,
-                   media='Photo')
-session.follow_by_list(followlist=['samantha3', 'larry_ok'], times=2, sleep_delay=600, interact=True)
+    session.set_user_interact(amount=4, percentage=50, randomize=True, media='Photo')
+    session.follow_by_list(followlist=['samantha3', 'larry_ok'], times=2, sleep_delay=600, interact=True)
 ```
 
 ### Follow someone else's followers
 
 ```python
-# Follows the followers of each given user
-# The usernames can be either a list or a string
-# The amount is for each account, in this case 30 users will be followed
-# If randomize is false it will pick in a top-down fashion
-
-session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, randomize=False)
-
-# default sleep_delay=600 (10min) for every 10 user following, in this case
-# sleep for 60 seconds
-
-session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, randomize=False, sleep_delay=60)
+    session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, randomize=False)
+    session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, randomize=False, sleep_delay=60)
 ```
 
 > **Note**: [simulation](#simulation) takes place while running this feature.
@@ -169,21 +149,18 @@ session.follow_user_followers(['friend1', 'friend2', 'friend3'], amount=10, rand
 ##### This will follow the people those liked photos of given list of users
 
 ```python
-session.follow_likers(['user1' , 'user2'], photos_grab_amount = 2, follow_likers_per_photo = 3, randomize=True, sleep_delay=600, interact=False)
+    session.follow_likers(['user1' , 'user2'], photos_grab_amount = 2, follow_likers_per_photo = 3, randomize=True, sleep_delay=600, interact=False)
 ```
 
 ```python
-session.set_user_interact(amount=2,
-                    percentage=70,
-                    randomize=True,
-                    media='Photo')
-session.follow_likers(['user1' , 'user2'], photos_grab_amount = 2, follow_likers_per_photo = 3, randomize=True, sleep_delay=600, interact=True)
+    session.set_user_interact(amount=2, percentage=70, randomize=True, media='Photo')
+    session.follow_likers(['user1' , 'user2'], photos_grab_amount = 2, follow_likers_per_photo = 3, randomize=True, sleep_delay=600, interact=True)
 ```
 
 ### Friending
 
 ```python
-session.friend('user1', daysold=365, max_pic = 100, sleep_delay=600, interact=False)
+    session.friend('user1', daysold=365, max_pic = 100, sleep_delay=600, interact=False)
 ```
 
 ### Friending by a list
@@ -191,7 +168,7 @@ session.friend('user1', daysold=365, max_pic = 100, sleep_delay=600, interact=Fa
 ##### This will add as friend each account from a list of facebook userids
 
 ```python
-friend_by_list(friendlist=['samantha3', 'larry_ok'], times=1, sleep_delay=600, interact=False)
+    friend_by_list(friendlist=['samantha3', 'larry_ok'], times=1, sleep_delay=600, interact=False)
 ```
 
 ### UnFriending by a list
@@ -199,7 +176,7 @@ friend_by_list(friendlist=['samantha3', 'larry_ok'], times=1, sleep_delay=600, i
 ##### This will unfriend each account from a list of facebook userids
 
 ```python
-unfriend_by_list(friendlist=['samantha3', 'larry_ok'], sleep_delay=6)
+    unfriend_by_list(friendlist=['samantha3', 'larry_ok'], sleep_delay=6)
 ```
 
 ### UnFriending by url list
@@ -207,7 +184,7 @@ unfriend_by_list(friendlist=['samantha3', 'larry_ok'], sleep_delay=6)
 ##### This will unfriend each account from a list of facebook profile full urls
 
 ```python
-unfriend_by_urllist(urllist=["facebook.com/profile.php?id=100023983575804&fref=pb&hc_location=friends_tab", "https://www.facebook.com/profile.php?id=100021936281017&fref=pb&hc_location=friends_tab"])
+    unfriend_by_urllist(urllist=["facebook.com/profile.php?id=100023983575804&fref=pb&hc_location=friends_tab", "https://www.facebook.com/profile.php?id=100021936281017&fref=pb&hc_location=friends_tab"])
 ```
 
 ### Follow/Unfollow/exclude not working?
@@ -215,7 +192,7 @@ unfriend_by_urllist(urllist=["facebook.com/profile.php?id=100023983575804&fref=p
 If you notice that one or more of the above functionalities are not working as expected - e.g. you have specified:
 
 ```python
-session.set_do_follow(enabled=True, percentage=10, times=2)
+    session.set_do_follow(enabled=True, percentage=10, times=2)
 ```
 
 ### Confirm friends received?
@@ -262,7 +239,6 @@ It searches for pages with a term , then visits each of those pages and adds the
 ```python
      session.add_likers_from_term(search_term = "fantasy")
 ```
-
 
 ### Withdraw outgoing friends requests
 
