@@ -46,30 +46,37 @@ session = FacebookPy(username="abc",
 
 ### Table of Contents
 
-* [FacebookPy Available Features](#facebookpy-available-features)
-  * [Following](#following)
-  * [Following by a list](#following-by-a-list)
-  * [Follow someone else's followers](#follow-someone-elses-followers)
-  * [Follow the likers of posts of users](#follow-the-likers-of-photos-of-users)
-  * [Friending](#friending)
-  * [Friending by a list](#friending-by-a-list)
-  * [UnFriending by a list](#unfriending-by-a-list)
-  * [UnFriending by url list](#unfriending-by-url-list)
-  * [Restricting Likes](#restricting-likes)
-  * [Ignoring Users](#ignoring-users)
-  * [Excluding friends](#excluding-friends)
-  * [Confirm friends received](confirm-friends-received)
-  * [Add suggested friends](Add-suggested-friends)
-  * [Quota Supervisor](#quota-supervisor)
-  * [Get recent friends](#get-recent-friends)
-  * [Invite friends to page](#invite-friends-to-page)
-  * [Add members of group](#add-members-of-group)
-  * [Add likers from term](#add-likers-from-term)
-  * [Withdraw outgoing friends requests](#withdraw-outgoing-friends-requests)
+- **[Settings](#settings)**
+  - [Following](#following)
+  - [Excluding friends](#excluding-friends)
+  - [Ignoring Users](#ignoring-users)
+  - [Restricting Likes](#restricting-likes)
+  - [Quota Supervisor](#quota-supervisor)
+
+ <br />
+
+- **[Actions](#actions)**
+  - [Following by a list](#following-by-a-list)
+  - [Follow someone else's followers](#follow-someone-elses-followers)
+  - [Follow the likers of posts of users](#follow-the-likers-of-photos-of-users)
+  - [Friending](#friending)
+  - [Friending by a list](#friending-by-a-list)
+  - [UnFriending by a list](#unfriending-by-a-list)
+  - [UnFriending by url list](#unfriending-by-url-list)
+  - [Confirm friends received](confirm-friends-received)
+  - [Add suggested friends](Add-suggested-friends)
+  - [Invite friends to page](#invite-friends-to-page)
+  - [Add members of group](#add-members-of-group)
+  - [Add likers from term](#add-likers-from-term)
+  - [Withdraw outgoing friends requests](#withdraw-outgoing-friends-requests)
 
 <br />
 
-## FacebookPy Available Features
+- **[Relationship tools](#relationship-tools)**
+  - [Get recent friends](#get-recent-friends)
+
+<br />
+
 
 ### Following
 
