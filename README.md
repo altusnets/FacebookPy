@@ -59,7 +59,7 @@ session = FacebookPy(username="abc",
   - [Following by a list](#following-by-a-list)
   - [Follow someone else's followers](#follow-someone-elses-followers)
   - [Follow the likers of posts of users](#follow-the-likers-of-photos-of-users)
-  - [Friending](#friending)
+  - [Friending a user](#friending)
   - [Friending by a list](#friending-by-a-list)
   - [UnFriending by a list](#unfriending-by-a-list)
   - [UnFriending by url list](#unfriending-by-url-list)
@@ -85,6 +85,44 @@ session = FacebookPy(username="abc",
 # (only follows a user once (if unfollowed again))
 
 session.set_do_follow(enabled=True, percentage=10, times=2)
+```
+### Restricting Likes
+
+```python
+session.set_dont_like(['#exactmatch', '[startswith', ']endswith', 'broadmatch'])
+```
+
+### Ignoring Users
+
+```python
+# completely ignore liking images from certain users
+
+session.set_ignore_users(['random_user', 'another_username'])
+```
+
+### Excluding friends
+
+```python
+# will prevent commenting on and unfollowing your good friends (the images will
+# still be liked)
+
+session.set_dont_include(['friend1', 'friend2', 'friend3'])
+```
+
+### Quota Supervisor
+
+```python
+  session.set_quota_supervisor(
+                      Settings, enabled=True,
+                      sleep_after=["likes", "comments_d", "follows", "unfollows", "server_calls_h"],
+                      sleepyhead=True,
+                      stochastic_flow=True,
+                      notify_me=True,
+                      peak_likes=(57, 585),
+                      peak_comments=(21, 182),
+                      peak_follows=(48, None),
+                      peak_unfollows=(35, 402),
+                      peak_server_calls=(None, 4700))
 ```
 
 ### Following by a list
@@ -178,29 +216,6 @@ unfriend_by_list(friendlist=['samantha3', 'larry_ok'], sleep_delay=6)
 unfriend_by_urllist(urllist=["facebook.com/profile.php?id=100023983575804&fref=pb&hc_location=friends_tab", "https://www.facebook.com/profile.php?id=100021936281017&fref=pb&hc_location=friends_tab"])
 ```
 
-### Restricting Likes
-
-```python
-session.set_dont_like(['#exactmatch', '[startswith', ']endswith', 'broadmatch'])
-```
-
-### Ignoring Users
-
-```python
-# completely ignore liking images from certain users
-
-session.set_ignore_users(['random_user', 'another_username'])
-```
-
-### Excluding friends
-
-```python
-# will prevent commenting on and unfollowing your good friends (the images will
-# still be liked)
-
-session.set_dont_include(['friend1', 'friend2', 'friend3'])
-```
-
 ### Follow/Unfollow/exclude not working?
 
 If you notice that one or more of the above functionalities are not working as expected - e.g. you have specified:
@@ -240,28 +255,6 @@ you can bypass it setting FacebookPy in this way:
 session = FacebookPy(username=facebook_username, password=facebook_password, bypass_suspicious_attempt=True)
 ```
 
-### Quota Supervisor
-
-```python
-  session.set_quota_supervisor(
-                      Settings, enabled=True,
-                      sleep_after=["likes", "comments_d", "follows", "unfollows", "server_calls_h"],
-                      sleepyhead=True,
-                      stochastic_flow=True,
-                      notify_me=True,
-                      peak_likes=(57, 585),
-                      peak_comments=(21, 182),
-                      peak_follows=(48, None),
-                      peak_unfollows=(35, 402),
-                      peak_server_calls=(None, 4700))
-```
-
-### get recent friends
-
-```python
-  session.get_recent_friends()
-```
-
 ### invite friends to page
 
 ```python
@@ -281,6 +274,12 @@ It searches for pages with a term , then visits each of those pages and adds the
 
 ```python
     session.withdraw_outgoing_friends_requests()
+```
+
+### Get recent friends
+
+```python
+  session.get_recent_friends()
 ```
 
 ## How to run:
