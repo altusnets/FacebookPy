@@ -16,7 +16,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import WebDriverException
 
 
-def bypass_suspicious_login(browser, bypass_with_mobile):
+def bypass_suspicious_login(browser, bypass_with_mobile, logger):
     """Bypass suspicious loggin attempt verification. This should be only
     enabled
     when there isn't available cookie for the username, otherwise it will and
@@ -69,7 +69,7 @@ def bypass_suspicious_login(browser, bypass_with_mobile):
                     "//label[@class='_q0nt5 _a7z3k']").text
 
             except Exception:
-                print("Unable to locate email or phone button, maybe "
+                logger.info("Unable to locate email or phone button, maybe "
                       "bypass_suspicious_login=True isn't needed anymore.")
                 return False
 
@@ -98,8 +98,8 @@ def bypass_suspicious_login(browser, bypass_with_mobile):
     # update server calls
     update_activity(Settings)
 
-    print('Facebook detected an unusual login attempt')
-    print('A security code was sent to your {}'.format(choice))
+    logger.info('Facebook detected an unusual login attempt')
+    logger.info('A security code was sent to your {}'.format(choice))
     security_code = input('Type the security code here: ')
 
     security_code_field = browser.find_element_by_xpath((
@@ -134,7 +134,7 @@ def bypass_suspicious_login(browser, bypass_with_mobile):
             "again.']"))
 
         if wrong_login is not None:
-            print(('Wrong security code! Please check the code Facebook'
+            logger.info(('Wrong security code! Please check the code Facebook'
                    'sent you and try again.'))
 
     except NoSuchElementException:
@@ -154,9 +154,8 @@ def login_user(browser,
     assert username, 'Username not provided'
     assert password, 'Password not provided'
 
-    print(username, password)
     ig_homepage = "https://www.facebook.com"
-    web_address_navigator( browser, ig_homepage, Settings)
+    web_address_navigator(browser, ig_homepage, logger, Settings)
     cookie_loaded = False
 
     # try to load cookie from username
@@ -166,7 +165,7 @@ def login_user(browser,
             browser.add_cookie(cookie)
             cookie_loaded = True
     except (WebDriverException, OSError, IOError):
-        print("Cookie file not found, creating cookie...")
+        logger.info("Cookie file not found, creating cookie...")
 
     # include time.sleep(1) to prevent getting stuck on google.com
     time.sleep(1)
@@ -178,7 +177,7 @@ def login_user(browser,
             if link.get_attribute('title') == "English (UK)":
                 click_element(browser, Settings, link)
 
-    web_address_navigator( browser, ig_homepage, Settings)
+    web_address_navigator(browser, ig_homepage, logger, Settings)
     reload_webpage(browser, Settings)
 
     # cookie has been LOADED, so the user SHOULD be logged in
@@ -191,7 +190,7 @@ def login_user(browser,
                                     logger,
                                     logfolder,
                                     True)
-    print('check_authorization:', login_state)
+    logger.info('check_authorization: {}'.format(login_state))
     if login_state is True:
         # dismiss_notification_offer(browser, logger)
         return True
@@ -199,7 +198,7 @@ def login_user(browser,
     # if user is still not logged in, then there is an issue with the cookie
     # so go create a new cookie..
     if cookie_loaded:
-        print("Issue with cookie for user {}. Creating "
+        logger.info("Issue with cookie for user {}. Creating "
               "new cookie...".format(username))
 
     # wait until the 'username' input element is located and visible
@@ -208,8 +207,8 @@ def login_user(browser,
 
     input_username = browser.find_element_by_xpath(input_username_XP)
 
-    print('moving to input_username')
-    print('entering input_username')
+    logger.info('moving to input_username')
+    logger.info('entering input_username')
     (ActionChains(browser)
      .move_to_element(input_username)
      .click()
@@ -228,7 +227,7 @@ def login_user(browser,
     if not isinstance(password, str):
         password = str(password)
 
-    print('entering input_password')
+    logger.info('entering input_password')
     (ActionChains(browser)
      .move_to_element(input_password[0])
      .click()
@@ -241,7 +240,7 @@ def login_user(browser,
 
     sleep(1)
 
-    print('submitting login_button')
+    logger.info('submitting login_button')
     login_button = browser.find_element_by_xpath('//*[@type="submit"]')
 
     (ActionChains(browser)
@@ -255,13 +254,13 @@ def login_user(browser,
     sleep(1)
 
     if bypass_suspicious_attempt is True:
-        bypass_suspicious_login(browser, bypass_with_mobile)
+        bypass_suspicious_login(browser, bypass_with_mobile, logger)
 
     # Check if user is logged-in (If there's two 'nav' elements)
     nav = browser.find_elements_by_xpath('//div[@role="navigation"]')
     if len(nav) == 2:
         # create cookie for username
-        print('logged in')
+        logger.info('logged in')
         pickle.dump(browser.get_cookies(), open(
             '{0}{1}_cookie.pkl'.format(logfolder, username), 'wb'))
         return True

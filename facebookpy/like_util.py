@@ -47,7 +47,7 @@ def get_links_for_username(browser,
 
     # Check URL of the webpage, if it already is user's profile page,
     # then do not navigate to it again
-    web_address_navigator( browser, user_link, Settings)
+    web_address_navigator(browser, user_link, logger, Settings)
 
     if "Page Not Found" in browser.title:
         logger.error(
@@ -146,7 +146,7 @@ def check_link(browser, post_link, dont_like, mandatory_words,
 
     # Check URL of the webpage, if it already is post's page, then do not
     # navigate to it again
-    web_address_navigator( browser, post_link, Settings)
+    web_address_navigator(browser, post_link, logger, Settings)
 
     """Check if the Post is Valid/Exists"""
     try:

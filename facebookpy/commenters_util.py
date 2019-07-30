@@ -19,15 +19,12 @@ from selenium.common.exceptions import NoSuchElementException
 def users_liked(browser, post_url, logger, amount=100):
     post_likers = []
     try:
-        web_address_navigator( browser, post_url, Settings)
+        web_address_navigator(browser, post_url, logger, Settings)
         post_likers = likers_from_post(browser, logger, amount)
         sleep(2)
     except NoSuchElementException:
-        print('Could not get information from post: ' +
-              post_url, ' nothing to return')
-
+        logger.info('Could not get information from post: {},  nothing to return'.format(post_url))
     return post_likers
-
 
 def likers_from_post(browser, logger, Selectors, amount=20):
     """ Get the list of users from the 'Likes' dialog of a photo """
@@ -41,7 +38,7 @@ def likers_from_post(browser, logger, Selectors, amount=20):
 
         sleep(1)
         click_element(browser, Settings, element_to_click)
-        print("opening likes")
+        logger.info("opening likes")
         # update server calls
         # update_activity(Settings)
 
@@ -74,34 +71,31 @@ def likers_from_post(browser, logger, Selectors, amount=20):
             progress_tracker(len(user_list), amount, start_time, None)
 
             if previous_len + 10 >= amount:
-                print("\nScrolling finished")
+                logger.info("Scrolling finished")
                 sleep(1)
                 break
 
-        print('\n')
-        # print('user_list:')
-        # print(user_list)
         random.shuffle(user_list)
         sleep(1)
 
         close_dialog_box(browser)
 
-        print(
+        logger.info(
             "Got {} likers shuffled randomly whom you can follow:\n{}"
             "\n".format(
                 len(user_list), user_list))
         return user_list
 
     except Exception as exc:
-        print("Some problem occured!\n\t{}".format(str(exc).encode("utf-8")))
+        logger.Error("Some problem occured!\n\t{}".format(str(exc).encode("utf-8")))
         return []
 
 
-def get_post_urls_from_profile(browser, userid, links_to_return_amount=1,
+def get_post_urls_from_profile(browser, userid, logger, links_to_return_amount=1,
                                randomize=True):
     try:
-        print("\nGetting likers from user: ", userid, "\n")
-        web_address_navigator( browser, 'https://www.facebook.com/' + userid + '/', Settings)
+        logger.info("Getting likers from user:  {}".format(userid))
+        web_address_navigator(browser, 'https://www.facebook.com/' + userid + '/', logger, Settings)
         sleep(1)
 
         posts_a_elems = browser.find_elements_by_xpath(
@@ -116,17 +110,18 @@ def get_post_urls_from_profile(browser, userid, links_to_return_amount=1,
                 if "/posts/" in post_url:
                     links.append(post_url)
             except Exception as es:
-                print(es)
+                logger.error(es)
 
         if randomize is True:
-            print("shuffling links")
+            logger.info("shuffling links")
             random.shuffle(links)
 
-        print("Got ", len(links), ", returning ",
-              min(links_to_return_amount, len(links)), " links: ",
-              links[:links_to_return_amount])
+        logger.info("Got {}, returning {} links: {}".format(
+                    len(links), min(links_to_return_amount, len(links)), links[:links_to_return_amount]
+                ))
         sleep(1)
         return links[:links_to_return_amount]
     except Exception as e:
-        print("Error: Couldnt get pictures links.", e)
+        logger.error("Error: Couldnt get pictures links.".format(e))
         return []
+

@@ -62,7 +62,7 @@ def get_friending_status(browser, track, username, person, person_id, logger,
     """ Verify if you are friending the user in the loaded page """
     if track == "profile":
         ig_homepage = "https://www.facebook.com/"
-        web_address_navigator( browser, ig_homepage + person, Settings)
+        web_address_navigator(browser, ig_homepage + person, logger, Settings)
 
     friend_button_XP = ("//div[@id='fbTimelineHeadline']/div/div/div/div/button[@type='button'][text()='Add Friend']")
     failure_msg = "--> Unable to detect the friending status of '{}'!"
@@ -81,7 +81,7 @@ def get_friending_status(browser, track, username, person, person_id, logger,
                                            logger,
                                            logfolder)
         if person_new:
-            web_address_navigator( browser, ig_homepage + person_new, Settings)
+            web_address_navigator(browser, ig_homepage + person_new, logger, Settings)
             valid_page = is_page_available(browser, logger, Settings)
             if not valid_page:
                 logger.error(failure_msg.format(person_new.encode("utf-8")))
@@ -129,7 +129,7 @@ def friend_user(browser, track, login, userid_to_friend, times, blacklist,
         return False, "already friended"
 
     user_link = "https://www.facebook.com/{}/".format(userid_to_friend)
-    web_address_navigator( browser, user_link, Settings)
+    web_address_navigator(browser, user_link, logger, Settings)
 
     # find out CURRENT friending status
     friending_status, friend_button = \
@@ -190,7 +190,7 @@ def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
     """ UnFriend a user either from the profile page or post page or dialog
     box """
     user_link = "https://www.facebook.com/{}/".format(userid_to_unfriend)
-    web_address_navigator( browser, user_link, Settings)
+    web_address_navigator(browser, user_link, logger, Settings)
     delay_random = random.randint(
                 ceil(sleep_delay * 0.85),
                 ceil(sleep_delay * 1.14))
@@ -236,7 +236,7 @@ def unfriend_user_by_url(browser, track, login, url, button, blacklist,
                 logger, logfolder, sleep_delay):
     """ UnFriend a user either from the profile page or post page or dialog
     box """
-    web_address_navigator( browser, url, Settings)
+    web_address_navigator(browser, url, logger, Settings)
     delay_random = random.randint(
                 ceil(sleep_delay * 0.85),
                 ceil(sleep_delay * 1.14))
@@ -369,7 +369,7 @@ def get_following_status(browser, track, username, person, person_id, logger,
     """ Verify if you are following the user in the loaded page """
     if track == "profile":
         ig_homepage = "https://www.facebook.com/"
-        web_address_navigator( browser, ig_homepage + person, Settings)
+        web_address_navigator(browser, ig_homepage + person, logger, Settings)
 
     follow_button_XP = ("//div/div/a[@role='button'][text()='Follow']")
     failure_msg = "--> Unable to detect the following status of '{}'!"
@@ -388,7 +388,7 @@ def get_following_status(browser, track, username, person, person_id, logger,
                                            logger,
                                            logfolder)
         if person_new:
-            web_address_navigator( browser, ig_homepage + person_new, Settings)
+            web_address_navigator(browser, ig_homepage + person_new, logger, Settings)
             valid_page = is_page_available(browser, logger, Settings)
             if not valid_page:
                 logger.error(failure_msg.format(person_new.encode("utf-8")))

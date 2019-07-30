@@ -361,6 +361,7 @@ class FacebookPy:
                                             "https://www.facebook.com/",
                                             self.username,
                                             self.userid,
+                                            self.logger,
                                             self.logfolder)
 
         self.following_num = log_following_num(self.browser,
@@ -368,6 +369,7 @@ class FacebookPy:
                                             "https://www.facebook.com/",
                                             self.username,
                                             self.userid,
+                                            self.logger,
                                             self.logfolder)
 
         return self
@@ -421,7 +423,7 @@ class FacebookPy:
 
             profile_as = self.browser.find_elements_by_css_selector("li > div > div > div.uiProfileBlockContent > div > div:nth-child(2) > div > a")
 
-            print("Found", len(profile_as), "profiles")
+            self.logger.info("Found {} profiles".format(len(profile_as)))
             profiles = []
             for profile_a in profile_as:
                 friend_url = profile_a.get_attribute('href').split('?')[0].split('#')[0]
@@ -431,14 +433,13 @@ class FacebookPy:
 
             for profile in profiles:
 
-                self.browser.get(profile+'/about')
+                self.browser.get(profile + '/about')
                 overview_events = self.browser.find_elements_by_css_selector("div > ul > li > div > div > span > div:nth-child(2)")
                 for overview_event in overview_events:
-                    # print(profile, overview_event.text)
                     try:
                         from dateutil.parser import parse
                         dob = parse(overview_event.text)
-                        print(profile, dob)
+                        self.logger.info("{} {}".format(profile, dob))
                         continue
                     except Exception as e:
                         self.logger.error(e)
@@ -491,6 +492,7 @@ class FacebookPy:
                 break
 
             post_urls = get_post_urls_from_profile(self.browser, userid,
+                                                   self.logger,
                                                    photos_grab_amount,
                                                    randomize)
             sleep(1)
@@ -561,8 +563,6 @@ class FacebookPy:
         self.logger.info("Not valid users: {}".format(not_valid_users))
 
         if interact is True:
-            print('')
-            # print results out of interactions
             self.logger.info("Liked: {}".format(liked))
             self.logger.info("Already Liked: {}".format(already_liked))
             self.logger.info("Commented: {}".format(commented))
@@ -674,7 +674,6 @@ class FacebookPy:
 
             if follow_restriction("read", acc_to_follow, self.follow_times,
                                   self.logger):
-                print('')
                 continue
 
             if not users_validated:
@@ -766,7 +765,6 @@ class FacebookPy:
             self.logger.info("Not valid users: {}".format(not_valid_users))
 
             if interact is True:
-                print('')
                 # find the feature-wide action sizes by taking a difference
                 liked = (self.liked_img - liked_init)
                 already_liked = (self.already_liked - already_liked_init)
@@ -1136,7 +1134,7 @@ class FacebookPy:
             except Exception as e:
                 failed_parsing += 1
                 self.logger.error(e)
-            self.logger.info("===== pending:{} === failed_parsing:{} === useless_ids:{} === collected for adding:{} =====".format(pending, failed_parsing, useless_ids, len(useful_userids)))
+            self.logger.info(" pending:{} === failed_parsing:{} === useless_ids:{} === collected for adding:{} ".format(pending, failed_parsing, useless_ids, len(useful_userids)))
             if len(useful_userids) >= max_add:
                 self.logger.info("Too many users for now, let's process")
                 break
@@ -1160,7 +1158,7 @@ class FacebookPy:
                 failed_adding += 1
                 self.logger.error(userid, e)
                 sleep(delay_random)
-            self.logger.info("===== pending:{} === failed_adding(or already friend):{} === useless_ids:{} === added:{}/{} =====".format(pending, failed_adding, useless_ids, added, len(useful_userids)))
+            self.logger.info(" pending:{} === failed_adding(or already friend):{} === useless_ids:{} === added:{}/{} ".format(pending, failed_adding, useless_ids, added, len(useful_userids)))
 
         if pending > 0:
             self.logger.info("{} pending(or already friend) sent outs".format(pending))
@@ -1284,7 +1282,7 @@ class FacebookPy:
                     invite_to_page_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Invite " + first_name + " to like your Pages')]")
                     invite_to_page_button.click()
                 except Exception as e:
-                    print(e)
+                    self.logger.error(e)
                     invite_to_page_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Invite " + first_name + " " + second_name + " to like your Pages')]")
                     invite_to_page_button.click()
                 sleep(delay_random)
@@ -1698,7 +1696,6 @@ class FacebookPy:
                     self.aborting = True
                     return self
 
-            print('')
             self.logger.info(
                 "Grabbed {} usernames from '{}'s `Followers` to do following\n"
                 .format(len(person_list), user))
@@ -1791,7 +1788,6 @@ class FacebookPy:
         self.logger.info("Not valid users: {}".format(not_valid_users))
 
         if interact is True:
-            print('')
             # print results out of interactions
             self.logger.info("Liked: {}".format(liked))
             self.logger.info("Already Liked: {}".format(already_liked))
@@ -1827,7 +1823,6 @@ class FacebookPy:
 
             message = "Session ended!"
             highlight_print(Settings, self.username, message, "end", "info", self.logger)
-            print("\n\n")
 
     @contextmanager
     def feature_in_feature(self, feature, validate_users):
@@ -1848,8 +1843,6 @@ class FacebookPy:
     def live_report(self):
         """ Report live sessional statistics """
 
-        print('')
-
         stats = [self.liked_img, self.already_liked,
                  self.commented,
                  self.followed, self.already_followed,
@@ -1860,6 +1853,7 @@ class FacebookPy:
                  self.invited, self.already_invited,
                  self.inap_img,
                  self.not_valid_users]
+        print(stats)
 
         if self.following_num and self.followed_by:
             owner_relationship_info = (

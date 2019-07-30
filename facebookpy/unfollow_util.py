@@ -37,7 +37,7 @@ def get_following_status(browser, track, username, person, person_id, logger,
     """ Verify if you are following the user in the loaded page """
     if track == "profile":
         ig_homepage = "https://www.facebook.com/"
-        web_address_navigator( browser, ig_homepage + person, Settings)
+        web_address_navigator(browser, ig_homepage + person, logger, Settings)
 
     follow_button_XP = ("//div/div/a[@role='button'][text()='Follow']")
     failure_msg = "--> Unable to detect the following status of '{}'!"
@@ -56,7 +56,7 @@ def get_following_status(browser, track, username, person, person_id, logger,
                                            logger,
                                            logfolder)
         if person_new:
-            web_address_navigator( browser, ig_homepage + person_new, Settings)
+            web_address_navigator(browser, ig_homepage + person_new, logger, Settings)
             valid_page = is_page_available(browser, logger, Settings)
             if not valid_page:
                 logger.error(failure_msg.format(person_new.encode("utf-8")))
@@ -102,7 +102,7 @@ def follow_user(browser, track, login, userid_to_follow, button, blacklist,
             # check URL of the webpage, if it already is user's profile
             # page, then do not navigate to it again
             user_link = "https://www.facebook.com/{}/".format(userid_to_follow)
-            web_address_navigator( browser, user_link, Settings)
+            web_address_navigator(browser, user_link, logger, Settings)
 
         # find out CURRENT following status
         following_status, follow_button = \
@@ -219,7 +219,7 @@ def get_given_user_followers(browser,
     user_name = user_name.strip()
 
     user_link = "https://www.facebook.com/{}".format(userid)
-    web_address_navigator( browser, user_link, Settings)
+    web_address_navigator(browser, user_link, logger, Settings)
 
     if not is_page_available(browser, logger, Settings):
         return [], []
@@ -241,7 +241,7 @@ def get_given_user_followers(browser,
     # locate element to user's followers
     user_followers_link = "https://www.facebook.com/{}/followers".format(
         userid)
-    web_address_navigator( browser, user_followers_link, Settings)
+    web_address_navigator(browser, user_followers_link, logger, Settings)
 
     try:
         followers_links = browser.find_elements_by_xpath(
@@ -403,7 +403,7 @@ def unfollow_user(browser, track, username, userid, person, person_id, button,
         """ Method of unfollowing from a user's profile page or post page """
         if track == "profile":
             user_link = "https://www.facebook.com/{}/".format(person)
-            web_address_navigator( browser, user_link, Settings)
+            web_address_navigator(browser, user_link, logger, Settings)
 
         # find out CURRENT follow status
         following_status, follow_button = get_following_status(browser,
@@ -529,8 +529,6 @@ def post_unfollow_cleanup(state, username, person, relationship_data,
 
     # save any unfollowed person
     log_record_all_unfollowed(username, person, logger, logfolder)
-    print('')
-
 
 def get_user_id(browser, track, username, logger):
     """ Get user's ID either from a profile page or post page """

@@ -18,7 +18,7 @@ PyVirtualDisplay == 0.2.1
 # quickstart.py: 6
 # quickstart_headed.py: 6
 # quickstart_headless.py: 6
-SocialCommons == 0.0.1
+SocialCommons == 0.0.3
 
 # facebookpy/comment_util.py: 5
 emoji == 0.5.1
