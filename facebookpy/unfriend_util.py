@@ -206,7 +206,7 @@ def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
         sleep(delay_random)
         return True, "success"
     except Exception as e:
-        logger.error(e)
+        logger.error("Failed to unfriend {} , with error {}".format(userid_to_unfriend, e))
         return False, ""
 
     # retry_times = 0

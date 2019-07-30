@@ -1023,45 +1023,32 @@ class FacebookPy:
                 ActionChains(self.browser).click().perform()
                 self.logger.info("{} Clicked".format(btn.text))
                 sleep(delay_random)
-                try:
-                    cancel_request_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Cancel Request')]")
-                    cancel_request_button.click()
-                    self.withdrawn += 1
-                    sleep(delay_random)
-                except Exception as e:
-                    self.logger.error(e)
+                options = ['Cancel request', 'Cancel Request']
+                good = False
+                msg = ''
+                for o in options:
                     try:
-                        cancel_request_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Cancel request')]")
+                        cancel_request_button = self.browser.find_element_by_xpath("//*[contains(text(), '" + o + "')]")
                         cancel_request_button.click()
+                        self.withdrawn += 1
                         sleep(delay_random)
+                        good = True
+                        break
                     except Exception as e:
-                        self.logger.error(e)
-                        #Dummy clicking outside to close the pop menu
-                        dummy_div = self.browser.find_element_by_css_selector("div.requestInfoContainer")
-                        ActionChains(self.browser).move_to_element(dummy_div).perform()
-                        ActionChains(self.browser).click().perform()
-                        self.logger.info("{} Clicked".format(dummy_div.text))
-                        sleep(delay_random)
+                        msg = str(e)
 
-                # retry_times = 0
-                # while(retry_times < 10):
-                #     try:
-                #         sleep(delay_random)
-                #         dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/cancel_request.png', grayscale=True, confidence=.7)
-                #         self.logger.info("cancel_request.png is Visible, lets click it")
-                #         pyautogui.moveTo(dropx, dropy)
-                #         sleep(delay_random)
-                #         pyautogui.click()
-                #         pyautogui.doubleClick()
-                #         sleep(delay_random*5)
-                #         self.logger.info("cancel_request.png Clicked")
-                #         break
-                #     except Exception as e:
-                #         self.logger.info('cancel_request.png is not yet visible. Error: {}'.format(e))
-                #     retry_times = retry_times + 1
+                if not good:
+                    self.logger.error(msg)
+                    #Dummy clicking outside to close the pop menu in case any
+                    dummy_div = self.browser.find_element_by_css_selector("div.requestInfoContainer")
+                    ActionChains(self.browser).move_to_element(dummy_div).perform()
+                    ActionChains(self.browser).click().perform()
+                    self.logger.info("{} Clicked".format(dummy_div.text))
+                    sleep(delay_random)
             except Exception as e:
                 self.logger.error(e)
-                self.browser.execute_script("window.scrollTo(0, " + str((i+1)*142) + ");")
+                break
+            # self.browser.execute_script("window.scrollTo(0, " + str((i+1)*142) + ");")
         self.logger.info("====End of withdraw_outgoing_friends_requests===")
 
     def refresh_links(self):
