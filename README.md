@@ -53,7 +53,7 @@ session = FacebookPy(username="abc",
   - [Restricting Likes](#restricting-likes)
   - [Quota Supervisor](#quota-supervisor)
 
- <br />
+<br />
 
 - **[Actions](#actions)**
   - [Following by a list](#following-by-a-list)
@@ -224,7 +224,7 @@ If you notice that one or more of the above functionalities are not working as e
 session.set_do_follow(enabled=True, percentage=10, times=2)
 ```
 
-### confirm friends received?
+### Confirm friends received?
 
 Confirm all the friends requests recieved.
 
@@ -238,7 +238,7 @@ Confirm all the friends requests recieved.
     session.add_members_of_group(group_id="941808466025179")
 ```
 
-### add suggested friends?
+### Add suggested friends?
 
 From friends suggested by facebook add top few
 
@@ -255,13 +255,13 @@ you can bypass it setting FacebookPy in this way:
 session = FacebookPy(username=facebook_username, password=facebook_password, bypass_suspicious_attempt=True)
 ```
 
-### invite friends to page
+### Invite friends to page
 
 ```python
   session.invite_friends_to_page(friendslist=['samantha3', 'larry_ok'])
 ```
 
-### add likers from term
+### Add likers from term
 
 It searches for pages with a term , then visits each of those pages and adds the likers of those pages
 
@@ -270,7 +270,7 @@ It searches for pages with a term , then visits each of those pages and adds the
 ```
 
 
-### withdraw outgoing friends requests
+### Withdraw outgoing friends requests
 
 ```python
     session.withdraw_outgoing_friends_requests()
