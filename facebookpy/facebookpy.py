@@ -150,6 +150,7 @@ class FacebookPy:
         self.following_num = 0
         self.friended = 0
         self.unfriended = 0
+        self.withdrawn = 0
         self.invited = 0
         self.already_invited = 0
         self.inap_img = 0
@@ -979,6 +980,7 @@ class FacebookPy:
         return adds
 
     def get_recent_friends(self):
+        self.logger.info("====Start get_recent_friends===")
         self.browser.get("https://www.facebook.com/{}/friends_recent".format(self.userid))
         friend_elems = self.browser.find_elements_by_css_selector("ul > li > div > div > div.uiProfileBlockContent > div > div:nth-child(2) > div > a")
         friends = []
@@ -987,9 +989,11 @@ class FacebookPy:
             if uid == 'profile.php':
                 continue
             friends.append(uid)
+        self.logger.info("====End of get_recent_friends===")
         return friends
 
     def get_recent_unnamed_friend_urls(self):
+        self.logger.info("====Start get_recent_unnamed_friend_urls===")
         self.browser.get("https://www.facebook.com/{}/friends_recent".format(self.userid))
         friend_elems = self.browser.find_elements_by_css_selector("ul > li > div > div > div.uiProfileBlockContent > div > div:nth-child(2) > div > a")
         friend_urls = []
@@ -998,6 +1002,7 @@ class FacebookPy:
             if uid != 'profile.php':
                 continue
             friend_urls.append(friend_elem.get_attribute('href'))
+        self.logger.info("====End of get_recent_unnamed_friend_urls===")
         return friend_urls
 
     def withdraw_outgoing_friends_requests(self, ignore_few=True, sleep_delay=6):
@@ -1023,6 +1028,7 @@ class FacebookPy:
                 try:
                     cancel_request_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Cancel Request')]")
                     cancel_request_button.click()
+                    self.withdrawn += 1
                     sleep(delay_random)
                 except Exception as e:
                     self.logger.error(e)
@@ -1066,7 +1072,7 @@ class FacebookPy:
         return likers_buttons
 
     def add_likers_from_term(self, search_term):
-        self.logger.info("About to add_likers_from_term: {}".format(search_term))
+        self.logger.info("===About to add_likers_from_term: {}".format(search_term))
         search_url = "https://www.facebook.com/search/pages/?q=" + search_term + "&epa=SERP_TAB"
         self.browser.get(search_url)
         for i in range(20):
@@ -1097,6 +1103,7 @@ class FacebookPy:
                         break
             except Exception as e:
                 self.logger.error(e)
+        self.logger.info("===End of add_likers_from_term")
 
     def process_rows_and_add_by_visiting(self, rows, added=0, max_add=50, sleep_delay=6):
         delay_random = random.randint(
@@ -1161,7 +1168,7 @@ class FacebookPy:
         self.logger.info("Total friends added so far: {}".format(added))
 
     def add_members_of_group(self, group_id, added=0, max_add=50, sleep_delay=6):
-        self.logger.info("About to add_members_of_group: {}".format(group_id))
+        self.logger.info("====About to add_members_of_group: {}".format(group_id))
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
@@ -1183,7 +1190,7 @@ class FacebookPy:
         return added
 
     def add_likers_of_page(self, page_likers_url, added=0, max_add=50, sleep_delay=6):
-        self.logger.info("About to add_likers_of_page: {}".format(page_likers_url))
+        self.logger.info("====About to add_likers_of_page: {}".format(page_likers_url))
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
                     ceil(sleep_delay * 1.14))
@@ -1847,6 +1854,10 @@ class FacebookPy:
                  self.commented,
                  self.followed, self.already_followed,
                  self.unfollowed,
+                 self.friended,
+                 self.unfriended,
+                 self.withdrawn,
+                 self.invited, self.already_invited,
                  self.inap_img,
                  self.not_valid_users]
 
@@ -1878,6 +1889,7 @@ class FacebookPy:
                 "\t|> UNFOLLOWED {} users\n"
                 "\t|> FRIENDED {} users\n"
                 "\t|> UNFRIENDED {} users\n"
+                "\t|> WITHDRAWN {} users\n"
                 "\t|> INVITED to Pages: {}  |  ALREADY INVITED: {}\n"
                 "\t|> LIKED {} comments\n"
                 "\t|> REPLIED to {} comments\n"
@@ -1892,6 +1904,7 @@ class FacebookPy:
                         self.unfollowed,
                         self.friended,
                         self.unfriended,
+                        self.withdrawn,
                         self.invited,
                         self.already_invited,
                         self.liked_comments,

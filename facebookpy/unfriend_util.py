@@ -202,6 +202,7 @@ def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
 
         unfriend_button = browser.find_element_by_xpath("//*[contains(text(), 'Unfriend')]")
         unfriend_button.click()
+        logger.info("---> {} has been successfully unfriended".format(userid_to_unfriend))
         sleep(delay_random)
         return True, "success"
     except Exception as e:
@@ -247,6 +248,7 @@ def unfriend_user_by_url(browser, track, login, url, button, blacklist,
 
         unfriend_button = browser.find_element_by_xpath("//*[contains(text(), 'Unfriend')]")
         unfriend_button.click()
+        logger.info("---> {} has been successfully unfriended".format(url))
         sleep(delay_random)
         return True, "success"
     except Exception as e:
