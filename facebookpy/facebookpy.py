@@ -981,12 +981,25 @@ class FacebookPy:
         self.logger.info("====Start get_recent_friends===")
         self.browser.get("https://www.facebook.com/{}/friends_recent".format(self.userid))
         friend_elems = self.browser.find_elements_by_css_selector("ul > li > div > div > div.uiProfileBlockContent > div > div:nth-child(2) > div > a")
+        self.logger.info("Total recent friends found = {}".format(len(friend_elems)))
+        sleep(10)
+        # print(friend_elems)
         friends = []
-        for friend_elem  in friend_elems:
-            uid = friend_elem.get_attribute('href').split('?')[0].split('/')[3]
-            if uid == 'profile.php':
-                continue
-            friends.append(uid)
+        corrup_indices = []
+        for idx, friend_elem in enumerate(friend_elems):
+            try:
+                uid = friend_elem.get_attribute('href').split('?')[0].split('/')[3]
+                if uid == 'profile.php':
+                    self.logger.info("Skipping unnamed friend")
+                    continue
+                if uid == self.userid:
+                    corrup_indices.append(idx)
+                    continue
+                friends.append(uid)
+                self.logger.info("Collected {}".format(uid))
+            except Exception as e:
+                self.logger.error(e)
+        self.logger.info("corrup_indices @ {}".format(corrup_indices))
         self.logger.info("====End of get_recent_friends===")
         return friends
 
@@ -1241,6 +1254,13 @@ class FacebookPy:
 
     #     self.logger.info("Total friends added so far: {}".format(added))
 
+    def try_invite_with(self, name):
+        try:
+            invite_to_page_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Invite " + name + " to like your Pages')]")
+            invite_to_page_button.click()
+        except Exception as e:
+            self.logger.error(e)
+
     def invite_friends_to_page(self, friendslist, pagename, sleep_delay=6):
         self.logger.info("====Start invite_friends_to_page===")
         delay_random = random.randint(
@@ -1262,16 +1282,9 @@ class FacebookPy:
                 sleep(delay_random)
 
                 title_name = self.browser.find_element_by_css_selector("span#fb-timeline-cover-name > a")
-                first_name = title_name.text.split(' ')[0]
-                if len(title_name.text.split(' ')) > 1:
-                    second_name = title_name.text.split(' ')[1]
-                try:
-                    invite_to_page_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Invite " + first_name + " to like your Pages')]")
-                    invite_to_page_button.click()
-                except Exception as e:
-                    self.logger.error(e)
-                    invite_to_page_button = self.browser.find_element_by_xpath("//*[contains(text(), 'Invite " + first_name + " " + second_name + " to like your Pages')]")
-                    invite_to_page_button.click()
+                if self.try_invite_with(title_name.text.split(' ')[0]) == False and len(title_name.text.split(' ')) > 1:
+                    if self.try_invite_with(title_name.text.split(' ')[1]) == False:
+                        self.try_invite_with(title_name)
                 sleep(delay_random)
 
                 # retry_times = 0

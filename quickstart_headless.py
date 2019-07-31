@@ -60,6 +60,7 @@ with smart_run(session):
     # session.fetch_birthdays()
     # session.confirm_friends()
     # session.add_suggested_friends()
+
     session.withdraw_outgoing_friends_requests()
     friendslist = session.get_recent_friends()
     print('recent friends', friendslist)
