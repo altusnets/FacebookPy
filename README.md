@@ -12,7 +12,6 @@ We will be supporting python 3.6.0 and above going forward
 
 ```bash
 curl https://pyenv.run | bash
-curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
 pyenv install 3.6.0
 pyenv local 3.6.0
 pip install -r requirements.txt
