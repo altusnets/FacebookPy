@@ -25,8 +25,8 @@ class Settings:
     IS_RUNNING = True
     log_location = localize_path("FacebookPy", "logs")
     OS_ENV = ("windows" if platform == "win32"
-        else "osx" if platform == "darwin"
-        else "linux")
+              else "osx" if platform == "darwin"
+              else "linux")
 
     specific_chromedriver = "chromedriver_{}".format(OS_ENV)
     chromedriver_location = localize_path("FacebookPy", "assets", specific_chromedriver)
@@ -73,13 +73,3 @@ class Settings:
 
     followers_count_xpath = '//a[@name="Followers"]/span[2]'
     following_count_xpath = '//a[@name="Following"]/span[2]'
-
-# class Storage:
-#     """ Globally accessible standalone storage """
-
-#     # store realtime record activity data
-#     record_activity = {}
-
-
-
-# state of instantiation of FacebookPy

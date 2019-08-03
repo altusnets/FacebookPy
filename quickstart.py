@@ -56,11 +56,11 @@ with smart_run(session):
                                   randomize=True, sleep_delay=600,
                                   interact=True)
 
-    session.follow_likers(random_targets, photos_grab_amount = 2, follow_likers_per_photo = 3, randomize=True, sleep_delay=600, interact=False)
+    session.follow_likers(random_targets, photos_grab_amount=2, follow_likers_per_photo=3, randomize=True, sleep_delay=600, interact=False)
     session.fetch_birthdays()
     session.confirm_friends()
     session.add_suggested_friends()
     friendslist = session.get_recent_friends()
     successfully_invited_friends = session.invite_friends_to_page(friendslist=friendslist, pagename="PickLively")
-    if random.randint(0,10)==5:
+    if random.randint(0, 10) == 5:
         session.unfriend_by_list(friendlist=successfully_invited_friends)

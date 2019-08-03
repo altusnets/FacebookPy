@@ -16,6 +16,7 @@ from .settings import Settings
 
 from selenium.common.exceptions import NoSuchElementException
 
+
 def users_liked(browser, post_url, logger, amount=100):
     post_likers = []
     try:
@@ -25,6 +26,7 @@ def users_liked(browser, post_url, logger, amount=100):
     except NoSuchElementException:
         logger.info('Could not get information from post: {},  nothing to return'.format(post_url))
     return post_likers
+
 
 def likers_from_post(browser, logger, Selectors, amount=20):
     """ Get the list of users from the 'Likes' dialog of a photo """
@@ -118,10 +120,9 @@ def get_post_urls_from_profile(browser, userid, logger, links_to_return_amount=1
 
         logger.info("Got {}, returning {} links: {}".format(
                     len(links), min(links_to_return_amount, len(links)), links[:links_to_return_amount]
-                ))
+                    ))
         sleep(1)
         return links[:links_to_return_amount]
     except Exception as e:
         logger.error("Error: Couldnt get pictures links.".format(e))
         return []
-

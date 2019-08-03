@@ -69,8 +69,7 @@ def bypass_suspicious_login(browser, bypass_with_mobile, logger):
                     "//label[@class='_q0nt5 _a7z3k']").text
 
             except Exception:
-                logger.info("Unable to locate email or phone button, maybe "
-                      "bypass_suspicious_login=True isn't needed anymore.")
+                logger.info("Unable to locate email or phone button, maybe bypass_suspicious_login=True isn't needed anymore.")
                 return False
 
     if bypass_with_mobile:
@@ -129,17 +128,15 @@ def bypass_suspicious_login(browser, bypass_with_mobile, logger):
     try:
         sleep(5)
         # locate wrong security code message
-        wrong_login = browser.find_element_by_xpath((
-            "//p[text()='Please check the code we sent you and try "
-            "again.']"))
+        wrong_login = browser.find_element_by_xpath(("//p[text()='Please check the code we sent you and try again.']"))
 
         if wrong_login is not None:
-            logger.info(('Wrong security code! Please check the code Facebook'
-                   'sent you and try again.'))
+            logger.info(('Wrong security code! Please check the code Facebook sent you and try again.'))
 
     except NoSuchElementException:
         # correct security code
         pass
+
 
 def login_user(browser,
                username,
@@ -182,14 +179,15 @@ def login_user(browser,
 
     # cookie has been LOADED, so the user SHOULD be logged in
     # check if the user IS logged in
-    login_state = check_authorization(browser, Settings,
-                                    "https://www.facebook.com/",
-                                    username,
-                                    userid,
-                                    "activity counts",
-                                    logger,
-                                    logfolder,
-                                    True)
+    login_state = check_authorization(browser,
+                                      Settings,
+                                      "https://www.facebook.com/",
+                                      username,
+                                      userid,
+                                      "activity counts",
+                                      logger,
+                                      logfolder,
+                                      True)
     logger.info('check_authorization: {}'.format(login_state))
     if login_state is True:
         # dismiss_notification_offer(browser, logger)
@@ -198,8 +196,7 @@ def login_user(browser,
     # if user is still not logged in, then there is an issue with the cookie
     # so go create a new cookie..
     if cookie_loaded:
-        logger.info("Issue with cookie for user {}. Creating "
-              "new cookie...".format(username))
+        logger.info("Issue with cookie for user {}. Creating new cookie...".format(username))
 
     # wait until the 'username' input element is located and visible
     input_username_XP = '//*[@id="email"]'
@@ -266,4 +263,3 @@ def login_user(browser,
         return True
     else:
         return False
-

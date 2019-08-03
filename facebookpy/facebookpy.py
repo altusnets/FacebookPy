@@ -30,11 +30,11 @@ from socialcommons.util import highlight_print
 from socialcommons.util import truncate_float
 from socialcommons.util import save_account_progress
 from socialcommons.util import parse_cli_args
-from .unfollow_util  import get_given_user_followers
-from .unfollow_util  import unfollow_user
-from .unfollow_util  import follow_user
-from .unfollow_util  import follow_restriction
-from .unfollow_util  import dump_follow_restriction
+from .unfollow_util import get_given_user_followers
+from .unfollow_util import unfollow_user
+from .unfollow_util import follow_user
+from .unfollow_util import follow_restriction
+from .unfollow_util import dump_follow_restriction
 from .unfriend_util import friend_user
 from .unfriend_util import unfriend_user
 from .unfriend_util import unfriend_user_by_url
@@ -50,10 +50,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 from socialcommons.exceptions import SocialPyError
 from .settings import Settings
-import pyautogui
 
 HOME = "/Users/ishandutta2007"
 CWD = HOME + "/Documents/Projects/FacebookPy"
+
 
 class FacebookPy:
     """Class to be instantiated to use the script"""
@@ -318,7 +318,6 @@ class FacebookPy:
         if len(err_msg) > 0:
             raise SocialPyError(err_msg)
 
-
     def login(self):
         """Used to login the user either with the username and password"""
         if not login_user(self.browser,
@@ -349,12 +348,11 @@ class FacebookPy:
             # try to save account progress
             try:
                 save_account_progress(self.browser,
-                                    "https://www.facebook.com/",
-                                    self.username,
-                                    self.logger)
+                                      "https://www.facebook.com/",
+                                      self.username,
+                                      self.logger)
             except Exception:
-                self.logger.warning(
-                    'Unable to save account progress, skipping data update')
+                self.logger.warning('Unable to save account progress, skipping data update')
 
         self.followed_by = log_follower_num(self.browser,
                                             Settings,
@@ -365,15 +363,13 @@ class FacebookPy:
                                             self.logfolder)
 
         self.following_num = log_following_num(self.browser,
-                                            Settings,
-                                            "https://www.facebook.com/",
-                                            self.username,
-                                            self.userid,
-                                            self.logger,
-                                            self.logfolder)
-
+                                               Settings,
+                                               "https://www.facebook.com/",
+                                               self.username,
+                                               self.userid,
+                                               self.logger,
+                                               self.logfolder)
         return self
-
 
     def set_do_follow(self, enabled=False, percentage=0, times=1):
         """Defines if the user of the liked image should be followed"""
@@ -444,10 +440,8 @@ class FacebookPy:
                     except Exception as e:
                         self.logger.error(e)
         except Exception as e:
-                self.logger.error(e)
-                traceback.print_exc()
-
-
+            self.logger.error(e)
+            traceback.print_exc()
 
     def follow_likers(self, userids, photos_grab_amount=3,
                       follow_likers_per_photo=3, randomize=True,
@@ -545,7 +539,6 @@ class FacebookPy:
                             sleep(delay_random)
                             relax_point = random.randint(7, 14)
                             followed_new = 0
-                            pass
 
         self.logger.info("Finished following Likers!\n")
 
@@ -594,14 +587,14 @@ class FacebookPy:
                 continue
 
             friend_state, msg = unfriend_user(self.browser,
-                                            "profile",
-                                            self.username,
-                                            acc_to_unfriend,
-                                            None,
-                                            self.blacklist,
-                                            self.logger,
-                                            self.logfolder,
-                                            sleep_delay=sleep_delay)
+                                              "profile",
+                                              self.username,
+                                              acc_to_unfriend,
+                                              None,
+                                              self.blacklist,
+                                              self.logger,
+                                              self.logfolder,
+                                              sleep_delay=sleep_delay)
             if friend_state:
                 self.unfriended += 1
         self.logger.info("====End of unfriend_by_list===")
@@ -611,14 +604,14 @@ class FacebookPy:
         self.logger.info("About to unfriend following: {}".format(urllist))
         for url in urllist:
             friend_state, msg = unfriend_user_by_url(self.browser,
-                                            "profile",
-                                            self.username,
-                                            url,
-                                            None,
-                                            self.blacklist,
-                                            self.logger,
-                                            self.logfolder,
-                                            sleep_delay=sleep_delay)
+                                                     "profile",
+                                                     self.username,
+                                                     url,
+                                                     None,
+                                                     self.blacklist,
+                                                     self.logger,
+                                                     self.logfolder,
+                                                     sleep_delay=sleep_delay)
             if friend_state:
                 self.unfriended += 1
         self.logger.info("====End of unfriend_by_urllist===")
@@ -699,7 +692,6 @@ class FacebookPy:
                 sleep(delay_random)
                 followed_new = 0
                 relax_point = random.randint(7, 14)
-                pass
 
             if not follow_restriction("read", acc_to_follow, self.follow_times,
                                       self.logger):
@@ -912,7 +904,7 @@ class FacebookPy:
 
         return comments
 
-    def confirm_friends(self, max_confirms=100, sleep_delay = 6):
+    def confirm_friends(self, max_confirms=100, sleep_delay=6):
         self.browser.get("https://www.facebook.com/friends/requests/")
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
@@ -941,7 +933,7 @@ class FacebookPy:
             self.logger.error(e)
         return confirms
 
-    def add_suggested_friends(self, max_confirms=100, sleep_delay = 6):
+    def add_suggested_friends(self, max_confirms=100, sleep_delay=6):
         self.browser.get("https://www.facebook.com/friends/requests/")
         delay_random = random.randint(
                     ceil(sleep_delay * 0.85),
@@ -964,8 +956,7 @@ class FacebookPy:
                         self.logger.error(e)
                     self.logger.info("Clicked {}".format(confirm_button.text))
                     adds += 1
-                    if friend_state:
-                        self.friended += 1
+                    self.friended += 1
                     self.logger.info("Add Friends sent in this iteration: {}".format(adds))
                     if adds >= max_confirms:
                         self.logger.info("max Add Friends ({}) for this iteration reached , Returning...".format(max_confirms))
@@ -1008,7 +999,7 @@ class FacebookPy:
         self.browser.get("https://www.facebook.com/{}/friends_recent".format(self.userid))
         friend_elems = self.browser.find_elements_by_css_selector("ul > li > div > div > div.uiProfileBlockContent > div > div:nth-child(2) > div > a")
         friend_urls = []
-        for friend_elem  in friend_elems:
+        for friend_elem in friend_elems:
             uid = friend_elem.get_attribute('href').split('?')[0].split('/')[3]
             if uid != 'profile.php':
                 continue
@@ -1052,7 +1043,7 @@ class FacebookPy:
 
                 if not good:
                     self.logger.error(msg)
-                    #Dummy clicking outside to close the pop menu in case any
+                    # Dummy clicking outside to close the pop menu in case any
                     dummy_div = self.browser.find_element_by_css_selector("div.requestInfoContainer")
                     ActionChains(self.browser).move_to_element(dummy_div).perform()
                     ActionChains(self.browser).click().perform()
@@ -1080,10 +1071,10 @@ class FacebookPy:
         sleep(2)
         links = []
         added = 0
-        l = list(range(len(likers_buttons)))
-        random.shuffle(l)
-        self.logger.info("Will explore pages in following order of index: {}".format(l))
-        for i in l:
+        likers_indices = list(range(len(likers_buttons)))
+        random.shuffle(likers_indices)
+        self.logger.info("Will explore pages in following order of index: {}".format(likers_indices))
+        for i in likers_indices:
             try:
                 likers_button = likers_buttons[i]
                 link = likers_button.get_attribute('href')
@@ -1116,7 +1107,7 @@ class FacebookPy:
                 btn = row.find_element_by_css_selector("div.FriendButton > button.FriendRequestAdd.addButton")
 
                 before_text = btn.text.strip()
-                if before_text!='Add Friend':
+                if before_text != 'Add Friend':
                     pending += 1
                     continue
 
@@ -1126,7 +1117,7 @@ class FacebookPy:
 
                 prof_link = row.find_element_by_css_selector("a")
                 userid = prof_link.get_attribute('href').split('?')[0].split('/')[3]
-                if userid=='profile.php':
+                if userid == 'profile.php':
                     useless_ids += 1
                     continue
                 useful_userids.append(userid)
@@ -1143,13 +1134,13 @@ class FacebookPy:
         for userid in useful_userids:
             try:
                 friend_state, msg = friend_user(self.browser,
-                                "profile",
-                                self.username,
-                                userid,
-                                self.friend_times,
-                                self.blacklist,
-                                self.logger,
-                                self.logfolder)
+                                                "profile",
+                                                self.username,
+                                                userid,
+                                                self.friend_times,
+                                                self.blacklist,
+                                                self.logger,
+                                                self.logfolder)
                 if friend_state:
                     added += 1
                 else:
@@ -1174,8 +1165,6 @@ class FacebookPy:
         self.browser.get(group_members_url)
         self.logger.info("Visiting to add members of group: {}".format(group_id))
 
-        en_txt = self.browser.find_element_by_css_selector("#pagelet_rhc_footer > div > div.uiContextualLayerParent > div > div > div > div > span:nth-child(1)")
-
         for i in range(20):
             self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             sleep(delay_random)
@@ -1194,8 +1183,6 @@ class FacebookPy:
                     ceil(sleep_delay * 1.14))
         self.browser.get(page_likers_url)
         self.logger.info("Visiting to add likers of page: {}".format(page_likers_url))
-
-        en_txt = self.browser.find_element_by_css_selector("#pagelet_rhc_footer > div > div.uiContextualLayerParent > div > div > div > div > span:nth-child(1)")
 
         for i in range(20):
             self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -1282,8 +1269,8 @@ class FacebookPy:
                 sleep(delay_random)
 
                 title_name = self.browser.find_element_by_css_selector("span#fb-timeline-cover-name > a")
-                if self.try_invite_with(title_name.text.split(' ')[0]) == False and len(title_name.text.split(' ')) > 1:
-                    if self.try_invite_with(title_name.text.split(' ')[1]) == False:
+                if self.try_invite_with(title_name.text.split(' ')[0]) is False and len(title_name.text.split(' ')) > 1:
+                    if self.try_invite_with(title_name.text.split(' ')[1]) is False:
                         self.try_invite_with(title_name)
                 sleep(delay_random)
 
@@ -1307,7 +1294,7 @@ class FacebookPy:
                 rows = self.browser.find_elements_by_css_selector("div > div > div > div > div > div > div > div > div.uiScrollableArea > div.uiScrollableAreaWrap > div > div > ul > li > div > table > tbody > tr")
                 for row in rows:
                     text_elem = row.find_element_by_css_selector("td:nth-child(2) > div.ellipsis > a > span")
-                    if text_elem.text!=pagename:
+                    if text_elem.text != pagename:
                         continue
                     button_elem = row.find_element_by_css_selector("td:nth-child(3) > button")
                     if button_elem.text == 'Invited':

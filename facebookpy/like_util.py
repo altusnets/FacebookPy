@@ -12,11 +12,12 @@ from socialcommons.util import web_address_navigator
 from socialcommons.util import get_number_of_posts
 from socialcommons.util import get_action_delay
 from socialcommons.quota_supervisor import quota_supervisor
-from .unfollow_util  import get_following_status
+from .unfollow_util import get_following_status
 from .settings import Settings
 
 from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import NoSuchElementException
+
 
 def get_links_for_username(browser,
                            username,
@@ -50,9 +51,7 @@ def get_links_for_username(browser,
     web_address_navigator(browser, user_link, logger, Settings)
 
     if "Page Not Found" in browser.title:
-        logger.error(
-            'Facebook error: The link you followed may be broken, or the '
-            'page may have been removed...')
+        logger.error('Facebook error: The link you followed may be broken, or the page may have been removed...')
         return False
 
     # if private user, we can get links only if we following
@@ -278,8 +277,7 @@ def check_link(browser, post_link, dont_like, mandatory_words,
         elif dont_likes.startswith("]"):
             dont_like_regex.append("#[\d\w]+" + dont_likes[1:] + "([^\d\w]|$)")
         else:
-            dont_like_regex.append(
-                "#[\d\w]*" + dont_likes + "[\d\w]*([^\d\w]|$)")
+            dont_like_regex.append("#[\d\w]*" + dont_likes + "[\d\w]*([^\d\w]|$)")
 
     for dont_likes_regex in dont_like_regex:
         quash = re.search(dont_likes_regex, image_text, re.IGNORECASE)
@@ -354,6 +352,7 @@ def like_image(browser, username, blacklist, logger, logfolder, Settings):
 
     return False, "invalid element"
 
+
 def get_links(browser, page, logger, media, element):
     # Get image links in scope from hashtag, location and other pages
     link_elems = element.find_elements_by_tag_name('a')
@@ -420,4 +419,3 @@ def verify_liking(browser, max, min, logger):
         return False
 
     return True
-

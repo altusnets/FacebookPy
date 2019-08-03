@@ -32,6 +32,7 @@ from .settings import Settings
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
 
+
 def get_following_status(browser, track, username, person, person_id, logger,
                          logfolder):
     """ Verify if you are following the user in the loaded page """
@@ -187,6 +188,7 @@ def follow_user(browser, track, login, userid_to_follow, button, blacklist,
     sleep(naply)
 
     return True, "success"
+
 
 def get_given_user_followers(browser,
                              login,
@@ -502,7 +504,6 @@ def confirm_unfollow(browser):
 
             elif isinstance(exc, NoSuchElementException):
                 sleep(1)
-                pass
 
 
 def post_unfollow_cleanup(state, username, person, relationship_data,
@@ -529,6 +530,7 @@ def post_unfollow_cleanup(state, username, person, relationship_data,
 
     # save any unfollowed person
     log_record_all_unfollowed(username, person, logger, logfolder)
+
 
 def get_user_id(browser, track, username, logger):
     """ Get user's ID either from a profile page or post page """
@@ -639,4 +641,3 @@ def verify_action(browser, action, track, username, person, person_id, logger,
                 return False, "unexpected"
 
     return True, "success"
-

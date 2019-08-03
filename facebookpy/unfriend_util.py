@@ -23,13 +23,12 @@ from .settings import Settings
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotVisibleException
 from selenium.webdriver.common.action_chains import ActionChains
-import pyautogui
 
 HOME = "/Users/ishandutta2007"
 CWD = HOME + "/Documents/Projects/FacebookPy"
 
-def verify_username_by_id(browser, username, person, person_id, logger,
-                          logfolder):
+
+def verify_username_by_id(browser, username, person, person_id, logger, logfolder):
     """ Check if the given user has changed username after the time of
     followed """
     # try to find the user by ID
@@ -56,6 +55,7 @@ def verify_username_by_id(browser, username, person, person_id, logger,
                 person))
 
     return None
+
 
 def get_friending_status(browser, track, username, person, person_id, logger,
                          logfolder):
@@ -132,26 +132,24 @@ def friend_user(browser, track, login, userid_to_friend, times, blacklist,
     web_address_navigator(browser, user_link, logger, Settings)
 
     # find out CURRENT friending status
-    friending_status, friend_button = \
-        get_friending_status(browser,
-                                track,
-                                login,
-                                userid_to_friend,
-                                None,
-                                logger,
-                                logfolder)
+    friending_status, friend_button = get_friending_status(browser,
+                                                           track,
+                                                           login,
+                                                           userid_to_friend,
+                                                           None,
+                                                           logger,
+                                                           logfolder)
     logger.info(friending_status)
     if friending_status in ["Add Friend"]:
         click_visibly(browser, Settings, friend_button)  # click to friend
         friend_state, msg = verify_action(browser, "friend", track, login,
-                                            userid_to_friend, None, logger,
-                                            logfolder)
+                                          userid_to_friend, None, logger,
+                                          logfolder)
         if friend_state is not True:
             return False, msg
     elif friending_status is None:
         # TODO:BUG:2nd login has to be fixed with userid of loggedin user
-        sirens_wailing, emergency_state = emergency_exit(browser, Settings, "https://facebook.com", login,
-                                                            login, logger, logfolder)
+        sirens_wailing, emergency_state = emergency_exit(browser, Settings, "https://facebook.com", login, login, logger, logfolder)
         if sirens_wailing is True:
             return False, emergency_state
 
@@ -173,8 +171,8 @@ def friend_user(browser, track, login, userid_to_friend, times, blacklist,
 
     return True, "success"
 
-def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
-                logger, logfolder, sleep_delay):
+
+def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist, logger, logfolder, sleep_delay):
     """ UnFriend a user either from the profile page or post page or dialog
     box """
     user_link = "https://www.facebook.com/{}/".format(userid_to_unfriend)
@@ -197,8 +195,8 @@ def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist,
         logger.error("Failed to unfriend {}, with error {}".format(userid_to_unfriend, e))
         return False, ""
 
-def unfriend_user_by_url(browser, track, login, url, button, blacklist,
-                logger, logfolder, sleep_delay):
+
+def unfriend_user_by_url(browser, track, login, url, button, blacklist, logger, logfolder, sleep_delay):
     """ UnFriend a user either from the profile page or post page or dialog
     box """
     web_address_navigator(browser, url, logger, Settings)
@@ -220,28 +218,6 @@ def unfriend_user_by_url(browser, track, login, url, button, blacklist,
         logger.error(e)
         return False, ""
 
-    # sleep(delay_random)
-    # retry_times = 0
-    # while(retry_times < 10):
-    #     try:
-    #         sleep(delay_random)
-    #         dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/unfriend.png', grayscale=True, confidence=.6)
-    #         logger.info("unfriend.png is Visible, lets click it")
-    #         pyautogui.moveTo(dropx, dropy)
-    #         sleep(delay_random)
-    #         pyautogui.click()
-    #         pyautogui.doubleClick()
-    #         sleep(delay_random)
-    #         logger.info("unfriend.png Clicked")
-    #         break
-    #     except Exception as e:
-    #         logger.info('unfriend.png is not yet visible. Error: {}'.format(e))
-    #     retry_times = retry_times + 1
-    # sleep(delay_random)
-    # if retry_times < 10:
-    #     return True, "success"
-    # else:
-    #     return False, ""
 
 def friend_restriction(operation, username, limit, logger):
     """ Keep track of the friended users and help avoid excessive friend of
@@ -304,6 +280,7 @@ def friend_restriction(operation, username, limit, logger):
             # close the open connection
             conn.close()
 
+
 def confirm_unfriend(browser):
     """ Deal with the confirmation dialog boxes during an unfollow """
     attempt = 0
@@ -327,7 +304,7 @@ def confirm_unfriend(browser):
 
             elif isinstance(exc, NoSuchElementException):
                 sleep(1)
-                pass
+
 
 def get_following_status(browser, track, username, person, person_id, logger,
                          logfolder):
@@ -453,6 +430,7 @@ def verify_action(browser, action, track, username, person, person_id, logger,
 
     return True, "success"
 
+
 def get_user_id(browser, track, username, logger):
     """ Get user's ID either from a profile page or post page """
     user_id = "unknown"
@@ -462,4 +440,3 @@ def get_user_id(browser, track, username, logger):
         user_id = find_user_id(Settings, browser, track, username, logger)
 
     return user_id
-

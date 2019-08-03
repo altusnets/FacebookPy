@@ -52,8 +52,8 @@ setup(
     # include_package_data=True,  # <- packs every data file in the package
     package_data={   # we need only the files below:
         "facebookpy": ["icons/Windows/*.ico",
-                    "icons/Linux/*.png",
-                    "icons/Mac/*.icns"]
+                       "icons/Linux/*.png",
+                       "icons/Mac/*.icns"]
     },
     keywords=(
         "facebookpy python facebook automation \

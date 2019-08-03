@@ -164,6 +164,7 @@ def verify_commenting(browser, max, min, mand_words, logger):
 
     return True, 'Approval'
 
+
 def is_commenting_enabled(browser, logger):
     """ Find out if commenting on the post is enabled """
 
