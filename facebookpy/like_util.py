@@ -51,7 +51,8 @@ def get_links_for_username(browser,
     web_address_navigator(browser, user_link, logger, Settings)
 
     if "Page Not Found" in browser.title:
-        logger.error('Facebook error: The link you followed may be broken, or the page may have been removed...')
+        logger.error(
+            'Facebook error: The link you followed may be broken, or the page may have been removed...')
         return False
 
     # if private user, we can get links only if we following
@@ -271,13 +272,18 @@ def check_link(browser, post_link, dont_like, mandatory_words,
 
     for dont_likes in dont_like:
         if dont_likes.startswith("#"):
-            dont_like_regex.append(dont_likes + "([^\d\w]|$)")
+            dont_like_regex.append(dont_likes + r"([^\d\w]|$)")
         elif dont_likes.startswith("["):
-            dont_like_regex.append("#" + dont_likes[1:] + "[\d\w]+([^\d\w]|$)")
+            dont_like_regex.append(
+                "#" + dont_likes[1:] + r"[\d\w]+([^\d\w]|$)")
         elif dont_likes.startswith("]"):
-            dont_like_regex.append("#[\d\w]+" + dont_likes[1:] + "([^\d\w]|$)")
+            dont_like_regex.append(
+                r"#[\d\w]+" + dont_likes[1:] + r"([^\d\w]|$)")
         else:
-            dont_like_regex.append("#[\d\w]*" + dont_likes + "[\d\w]*([^\d\w]|$)")
+            dont_like_regex.append(
+                r"#[\d\w]*" +
+                dont_likes +
+                r"[\d\w]*([^\d\w]|$)")
 
     for dont_likes_regex in dont_like_regex:
         quash = re.search(dont_likes_regex, image_text, re.IGNORECASE)

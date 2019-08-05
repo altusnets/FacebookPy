@@ -28,7 +28,8 @@ HOME = "/Users/ishandutta2007"
 CWD = HOME + "/Documents/Projects/FacebookPy"
 
 
-def verify_username_by_id(browser, username, person, person_id, logger, logfolder):
+def verify_username_by_id(browser, username, person,
+                          person_id, logger, logfolder):
     """ Check if the given user has changed username after the time of
     followed """
     # try to find the user by ID
@@ -37,7 +38,8 @@ def verify_username_by_id(browser, username, person, person_id, logger, logfolde
 
     if person_id and person_id not in [None, "unknown", "undefined"]:
         # get the [new] username of the user from the stored user ID
-        person_new = get_username_from_id(browser, "https://www.facebook.com", person_id, logger)
+        person_new = get_username_from_id(
+            browser, "https://www.facebook.com", person_id, logger)
         if person_new:
             if person_new != person:
                 logger.info(
@@ -64,7 +66,8 @@ def get_friending_status(browser, track, username, person, person_id, logger,
         ig_homepage = "https://www.facebook.com/"
         web_address_navigator(browser, ig_homepage + person, logger, Settings)
 
-    friend_button_XP = ("//div[@id='fbTimelineHeadline']/div/div/div/div/button[@type='button'][text()='Add Friend']")
+    friend_button_XP = (
+        "//div[@id='fbTimelineHeadline']/div/div/div/div/button[@type='button'][text()='Add Friend']")
     failure_msg = "--> Unable to detect the friending status of '{}'!"
     user_inaccessible_msg = (
         "Couldn't access the profile page of '{}'!\t~might have changed the"
@@ -81,7 +84,12 @@ def get_friending_status(browser, track, username, person, person_id, logger,
                                            logger,
                                            logfolder)
         if person_new:
-            web_address_navigator(browser, ig_homepage + person_new, logger, Settings)
+            web_address_navigator(
+                browser,
+                ig_homepage +
+                person_new,
+                logger,
+                Settings)
             valid_page = is_page_available(browser, logger, Settings)
             if not valid_page:
                 logger.error(failure_msg.format(person_new.encode("utf-8")))
@@ -149,7 +157,8 @@ def friend_user(browser, track, login, userid_to_friend, times, blacklist,
             return False, msg
     elif friending_status is None:
         # TODO:BUG:2nd login has to be fixed with userid of loggedin user
-        sirens_wailing, emergency_state = emergency_exit(browser, Settings, "https://facebook.com", login, login, logger, logfolder)
+        sirens_wailing, emergency_state = emergency_exit(
+            browser, Settings, "https://facebook.com", login, login, logger, logfolder)
         if sirens_wailing is True:
             return False, emergency_state
 
@@ -172,44 +181,53 @@ def friend_user(browser, track, login, userid_to_friend, times, blacklist,
     return True, "success"
 
 
-def unfriend_user(browser, track, login, userid_to_unfriend, button, blacklist, logger, logfolder, sleep_delay):
+def unfriend_user(browser, track, login, userid_to_unfriend,
+                  button, blacklist, logger, logfolder, sleep_delay):
     """ UnFriend a user either from the profile page or post page or dialog
     box """
     user_link = "https://www.facebook.com/{}/".format(userid_to_unfriend)
     web_address_navigator(browser, user_link, logger, Settings)
     delay_random = random.randint(
-                ceil(sleep_delay * 0.85),
-                ceil(sleep_delay * 1.14))
+        ceil(sleep_delay * 0.85),
+        ceil(sleep_delay * 1.14))
     try:
-        friend_button_elem = browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
+        friend_button_elem = browser.find_element_by_css_selector(
+            "div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
         ActionChains(browser).move_to_element(friend_button_elem).perform()
         ActionChains(browser).click().perform()
         sleep(delay_random)
 
-        unfriend_button = browser.find_element_by_xpath("//*[contains(text(), 'Unfriend')]")
+        unfriend_button = browser.find_element_by_xpath(
+            "//*[contains(text(), 'Unfriend')]")
         unfriend_button.click()
-        logger.info("---> {} has been successfully unfriended".format(userid_to_unfriend))
+        logger.info(
+            "---> {} has been successfully unfriended".format(userid_to_unfriend))
         sleep(delay_random)
         return True, "success"
     except Exception as e:
-        logger.error("Failed to unfriend {}, with error {}".format(userid_to_unfriend, e))
+        logger.error(
+            "Failed to unfriend {}, with error {}".format(
+                userid_to_unfriend, e))
         return False, ""
 
 
-def unfriend_user_by_url(browser, track, login, url, button, blacklist, logger, logfolder, sleep_delay):
+def unfriend_user_by_url(browser, track, login, url,
+                         button, blacklist, logger, logfolder, sleep_delay):
     """ UnFriend a user either from the profile page or post page or dialog
     box """
     web_address_navigator(browser, url, logger, Settings)
     delay_random = random.randint(
-                ceil(sleep_delay * 0.85),
-                ceil(sleep_delay * 1.14))
+        ceil(sleep_delay * 0.85),
+        ceil(sleep_delay * 1.14))
     try:
-        friend_button_elem = browser.find_element_by_css_selector("div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
+        friend_button_elem = browser.find_element_by_css_selector(
+            "div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
         ActionChains(browser).move_to_element(friend_button_elem).perform()
         ActionChains(browser).click().perform()
-        sleep(delay_random*2)
+        sleep(delay_random * 2)
 
-        unfriend_button = browser.find_element_by_xpath("//*[contains(text(), 'Unfriend')]")
+        unfriend_button = browser.find_element_by_xpath(
+            "//*[contains(text(), 'Unfriend')]")
         unfriend_button.click()
         logger.info("---> {} has been successfully unfriended".format(url))
         sleep(delay_random)
@@ -330,7 +348,12 @@ def get_following_status(browser, track, username, person, person_id, logger,
                                            logger,
                                            logfolder)
         if person_new:
-            web_address_navigator(browser, ig_homepage + person_new, logger, Settings)
+            web_address_navigator(
+                browser,
+                ig_homepage +
+                person_new,
+                logger,
+                Settings)
             valid_page = is_page_available(browser, logger, Settings)
             if not valid_page:
                 logger.error(failure_msg.format(person_new.encode("utf-8")))

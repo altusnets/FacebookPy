@@ -46,7 +46,8 @@ def open_comment_section(browser, logger):
         logger.warning(missing_comment_elem_warning)
 
 
-def comment_image(browser, username, comments, blacklist, logger, logfolder, Settings):
+def comment_image(browser, username, comments, blacklist,
+                  logger, logfolder, Settings):
     """Checks if it should comment on the image"""
     # check action availability
     if quota_supervisor(Settings, 'comments') == 'jump':

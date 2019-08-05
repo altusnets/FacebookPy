@@ -24,7 +24,8 @@ def users_liked(browser, post_url, logger, amount=100):
         post_likers = likers_from_post(browser, logger, amount)
         sleep(2)
     except NoSuchElementException:
-        logger.info('Could not get information from post: {},  nothing to return'.format(post_url))
+        logger.info(
+            'Could not get information from post: {},  nothing to return'.format(post_url))
     return post_likers
 
 
@@ -89,7 +90,9 @@ def likers_from_post(browser, logger, Selectors, amount=20):
         return user_list
 
     except Exception as exc:
-        logger.Error("Some problem occured!\n\t{}".format(str(exc).encode("utf-8")))
+        logger.Error(
+            "Some problem occured!\n\t{}".format(
+                str(exc).encode("utf-8")))
         return []
 
 
@@ -97,7 +100,13 @@ def get_post_urls_from_profile(browser, userid, logger, links_to_return_amount=1
                                randomize=True):
     try:
         logger.info("Getting likers from user:  {}".format(userid))
-        web_address_navigator(browser, 'https://www.facebook.com/' + userid + '/', logger, Settings)
+        web_address_navigator(
+            browser,
+            'https://www.facebook.com/' +
+            userid +
+            '/',
+            logger,
+            Settings)
         sleep(1)
 
         posts_a_elems = browser.find_elements_by_xpath(
@@ -119,7 +128,8 @@ def get_post_urls_from_profile(browser, userid, logger, links_to_return_amount=1
             random.shuffle(links)
 
         logger.info("Got {}, returning {} links: {}".format(
-                    len(links), min(links_to_return_amount, len(links)), links[:links_to_return_amount]
+                    len(links), min(links_to_return_amount, len(
+                        links)), links[:links_to_return_amount]
                     ))
         sleep(1)
         return links[:links_to_return_amount]

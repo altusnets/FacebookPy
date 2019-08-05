@@ -57,7 +57,12 @@ def get_following_status(browser, track, username, person, person_id, logger,
                                            logger,
                                            logfolder)
         if person_new:
-            web_address_navigator(browser, ig_homepage + person_new, logger, Settings)
+            web_address_navigator(
+                browser,
+                ig_homepage +
+                person_new,
+                logger,
+                Settings)
             valid_page = is_page_available(browser, logger, Settings)
             if not valid_page:
                 logger.error(failure_msg.format(person_new.encode("utf-8")))
@@ -253,7 +258,7 @@ def get_given_user_followers(browser,
             splitted = followers_link.get_attribute('href').replace(
                 'https://www.facebook.com/', '').split('?')
             if splitted[0] == 'profile.php':
-                u = splitted[0]+'?'+splitted[1]
+                u = splitted[0] + '?' + splitted[1]
             else:
                 u = splitted[0]
             followers_list.append(u)
@@ -417,7 +422,10 @@ def unfollow_user(browser, track, username, userid, person, person_id, button,
                                                                logfolder)
 
         if following_status in ["Following", "Requested"]:
-            click_element(browser, Settings, follow_button)  # click to unfollow
+            click_element(
+                browser,
+                Settings,
+                follow_button)  # click to unfollow
             sleep(4)  # TODO: use explicit wait here
             confirm_unfollow(browser)
             unfollow_state, msg = verify_action(browser, "unfollow", track,
@@ -553,7 +561,8 @@ def verify_username_by_id(browser, username, person, person_id, logger,
 
     if person_id and person_id not in [None, "unknown", "undefined"]:
         # get the [new] username of the user from the stored user ID
-        person_new = get_username_from_id(browser, "https://www.facebook.com", person_id, logger)
+        person_new = get_username_from_id(
+            browser, "https://www.facebook.com", person_id, logger)
         if person_new:
             if person_new != person:
                 logger.info(

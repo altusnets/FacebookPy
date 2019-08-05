@@ -63,12 +63,15 @@ with smart_run(session):
     session.withdraw_outgoing_friends_requests()
     friendslist = session.get_recent_friends()
     print('recent friends', friendslist)
-    net_invited_friends = session.invite_friends_to_page(friendslist=friendslist, pagename="PickLively")
+    net_invited_friends = session.invite_friends_to_page(
+        friendslist=friendslist, pagename="PickLively")
     print('successfully invited friends', net_invited_friends)
     if len(net_invited_friends) >= 6:
         random.shuffle(net_invited_friends)
         net_invited_friends = net_invited_friends[0:3]
-        session.unfriend_by_list(friendlist=net_invited_friends, pagename="PickLively")
+        session.unfriend_by_list(
+            friendlist=net_invited_friends,
+            pagename="PickLively")
     unnamed_friend_urls = session.get_recent_unnamed_friend_urls()
     print('recent unnamed_friend_urls', unnamed_friend_urls)
     session.unfriend_by_urllist(urllist=unnamed_friend_urls)
