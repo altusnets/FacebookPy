@@ -1151,6 +1151,7 @@ class FacebookPy:
         delay_random = random.randint(
             ceil(sleep_delay * 0.85),
             ceil(sleep_delay * 1.14))
+        self.logger.info("process_rows_and_add_by_visiting:")
         pending = 0
         useful_userids = []
         useless_ids = 0
@@ -1317,8 +1318,10 @@ class FacebookPy:
             invite_to_page_button = self.browser.find_element_by_xpath(
                 "//*[contains(text(), 'Invite " + name + " to like your Pages')]")
             invite_to_page_button.click()
+            return True
         except Exception as e:
             self.logger.error(e)
+            return False
 
     def invite_friends_to_page(self, friendslist, pagename, sleep_delay=6):
         self.logger.info("====Start invite_friends_to_page===")
@@ -1347,11 +1350,16 @@ class FacebookPy:
 
                 title_name = self.browser.find_element_by_css_selector(
                     "span#fb-timeline-cover-name > a")
-                if self.try_invite_with(title_name.text.split(
-                        ' ')[0]) is False and len(title_name.text.split(' ')) > 1:
-                    if self.try_invite_with(
-                            title_name.text.split(' ')[1]) is False:
-                        self.try_invite_with(title_name)
+                first_name = title_name.text.split(' ')[0]
+                if len(title_name.text.split(' ')) > 1:
+                    last_name = title_name.text.split(' ')[-1]
+                if len(title_name.text.split(' ')) > 2:
+                    middle_name = title_name.text.split(' ')[1]
+
+                if self.try_invite_with(first_name) is False:
+                    if middle_name and self.try_invite_with(first_name + ' ' + middle_name) is False:
+                        if self.try_invite_with(last_name) is False:
+                            self.try_invite_with(title_name)
                 sleep(delay_random)
 
                 rows = self.browser.find_elements_by_css_selector(
