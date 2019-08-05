@@ -1002,6 +1002,9 @@ class FacebookPy:
         self.logger.info("====Start get_recent_friends===")
         self.browser.get(
             "https://www.facebook.com/{}/friends_recent".format(self.userid))
+        sleep(5)
+        self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        sleep(5)
         friend_elems = self.browser.find_elements_by_css_selector(
             "ul > li > div > div > div.uiProfileBlockContent > div > div:nth-child(2) > div > a")
         self.logger.info(
@@ -1351,49 +1354,42 @@ class FacebookPy:
                         self.try_invite_with(title_name)
                 sleep(delay_random)
 
-                # retry_times = 0
-                # while(retry_times < 10):
-                #     try:
-                #         sleep(delay_random)
-                #         dropx, dropy = pyautogui.locateCenterOnScreen(CWD + '/pngs/invite_to_page_option.png', grayscale=True, confidence=.7)
-                #         self.logger.info("invite_to_page_option.png is Visible, lets click it")
-                #         pyautogui.moveTo(dropx, dropy)
-                #         sleep(delay_random)
-                #         pyautogui.click()
-                #         pyautogui.doubleClick()
-                #         sleep(delay_random)
-                #         self.logger.info("invite_to_page_option.png Clicked")
-                #         break
-                #     except Exception as e:
-                #         self.logger.info('invite_to_page_option.png is not yet visible. Error: {}'.format(e))
-                #     retry_times = retry_times + 1
-                sleep(delay_random)
                 rows = self.browser.find_elements_by_css_selector(
                     "div > div > div > div > div > div > div > div > div.uiScrollableArea > div.uiScrollableAreaWrap > div > div > ul > li > div > table > tbody > tr")
-                for row in rows:
-                    text_elem = row.find_element_by_css_selector(
-                        "td:nth-child(2) > div.ellipsis > a > span")
-                    if text_elem.text != pagename:
-                        continue
-                    button_elem = row.find_element_by_css_selector(
-                        "td:nth-child(3) > button")
-                    if button_elem.text == 'Invited':
-                        self.logger.info('Already invited: {}'.format(friend))
-                        net_invited_friends.append(friend)
-                        self.already_invited += 1
-                        self.invite_restriction(
-                            "write", pagename, friend, None, self.logger)
-                    else:
-                        ActionChains(self.browser).move_to_element(
-                            button_elem).perform()
-                        ActionChains(self.browser).click().perform()
-                        self.logger.info(
-                            '~---> Just invited: {}'.format(friend))
-                        net_invited_friends.append(friend)
-                        self.invited += 1
-                        self.invite_restriction(
-                            "write", pagename, friend, None, self.logger)
-                        sleep(delay_random)
+
+                for i, row in enumerate(rows):
+                    try:
+                        text_elem = row.find_element_by_css_selector(
+                            "td:nth-child(2) > div.ellipsis > a > span")
+
+                        cat_elem = row.find_element_by_css_selector(
+                            "td:nth-child(2) > div.ellipsis:nth-child(2)")
+                        cat_elem.click()
+
+                        if text_elem.text != pagename:
+                            continue
+
+                        button_elem = row.find_element_by_css_selector(
+                            "td:nth-child(3) > button")
+                        if button_elem.text == 'Invited':
+                            self.logger.info('Already invited: {}'.format(friend))
+                            net_invited_friends.append(friend)
+                            self.already_invited += 1
+                            self.invite_restriction(
+                                "write", pagename, friend, None, self.logger)
+                        else:
+                            ActionChains(self.browser).move_to_element(
+                                button_elem).perform()
+                            ActionChains(self.browser).click().perform()
+                            self.logger.info(
+                                '~---> Just invited: {}'.format(friend))
+                            net_invited_friends.append(friend)
+                            self.invited += 1
+                            self.invite_restriction(
+                                "write", pagename, friend, None, self.logger)
+                            sleep(delay_random)
+                    except Exception as e:
+                        self.logger.error(e)
             except Exception as e:
                 self.logger.error(
                     "Failed for friend {} with error {}".format(
