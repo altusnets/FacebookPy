@@ -18,11 +18,13 @@ from selenium.common.exceptions import InvalidElementStateException
 
 def get_comment_input(browser):
     comment_input = browser.find_elements_by_xpath(
-        '//textarea[@placeholder = "Add a comment…"]')
+        '//textarea[@placeholder = "Add a comment…"]'
+    )
 
     if len(comment_input) <= 0:
         comment_input = browser.find_elements_by_xpath(
-            '//input[@placeholder = "Add a comment…"]')
+            '//input[@placeholder = "Add a comment…"]'
+        )
 
     return comment_input
 
@@ -30,10 +32,12 @@ def get_comment_input(browser):
 def open_comment_section(browser, logger):
     missing_comment_elem_warning = (
         "--> Comment Button Not Found!"
-        "\t~may cause issues with browser windows of smaller widths")
+        "\t~may cause issues with browser windows of smaller widths"
+    )
 
     comment_elem = browser.find_elements_by_xpath(
-        "//button/span[@aria-label='Comment']")
+        "//button/span[@aria-label='Comment']"
+    )
 
     if len(comment_elem) > 0:
         try:
@@ -46,14 +50,13 @@ def open_comment_section(browser, logger):
         logger.warning(missing_comment_elem_warning)
 
 
-def comment_image(browser, username, comments, blacklist,
-                  logger, logfolder, Settings):
+def comment_image(browser, username, comments, blacklist, logger, logfolder, Settings):
     """Checks if it should comment on the image"""
     # check action availability
-    if quota_supervisor(Settings, 'comments') == 'jump':
+    if quota_supervisor(Settings, "comments") == "jump":
         return False, "jumped"
 
-    rand_comment = (random.choice(comments).format(username))
+    rand_comment = random.choice(comments).format(username)
     rand_comment = emoji.demojize(rand_comment)
     rand_comment = emoji.emojize(rand_comment, use_aliases=True)
 
@@ -66,36 +69,39 @@ def comment_image(browser, username, comments, blacklist,
             comment_input = get_comment_input(browser)
             # below, an extra space is added to force
             # the input box to update the reactJS core
-            comment_to_be_sent = rand_comment + ' '
+            comment_to_be_sent = rand_comment + " "
 
             browser.execute_script(
                 "arguments[0].value = arguments[1];",
-                comment_input[0], comment_to_be_sent)
+                comment_input[0],
+                comment_to_be_sent,
+            )
             # below, it also will remove that extra space added above
             # COS '\b' is a backspace char in ASCII
-            comment_input[0].send_keys('\b')
+            comment_input[0].send_keys("\b")
             comment_input = get_comment_input(browser)
             comment_input[0].submit()
-            update_activity(Settings, 'comments')
+            update_activity(Settings, "comments")
 
-            if blacklist['enabled'] is True:
-                action = 'commented'
-                add_user_to_blacklist(username,
-                                      blacklist['campaign'],
-                                      action,
-                                      logger,
-                                      logfolder)
+            if blacklist["enabled"] is True:
+                action = "commented"
+                add_user_to_blacklist(
+                    username, blacklist["campaign"], action, logger, logfolder
+                )
         else:
-            logger.warning("--> Comment Action Likely Failed!"
-                           "\t~comment Element was not found")
+            logger.warning(
+                "--> Comment Action Likely Failed!" "\t~comment Element was not found"
+            )
             return False, "commenting disabled"
 
     except InvalidElementStateException:
-        logger.warning("--> Comment Action Likely Failed!"
-                       "\t~encountered `InvalidElementStateException` :/")
+        logger.warning(
+            "--> Comment Action Likely Failed!"
+            "\t~encountered `InvalidElementStateException` :/"
+        )
         return False, "invalid element state"
 
-    logger.info("--> Commented: {}".format(rand_comment.encode('utf-8')))
+    logger.info("--> Commented: {}".format(rand_comment.encode("utf-8")))
 
     # get the post-comment delay time to sleep
     naply = get_action_delay("comment", Settings)
@@ -123,15 +129,15 @@ def verify_commenting(browser, max, min, mand_words, logger):
     if max is not None and comments_count > max:
         disapproval_reason = (
             "Not commented on this post! ~more comments exist"
-            " off maximum limit at {}"
-            .format(comments_count))
+            " off maximum limit at {}".format(comments_count)
+        )
         return False, disapproval_reason
 
     elif min is not None and comments_count < min:
         disapproval_reason = (
             "Not commented on this post! ~less comments exist"
-            " off minumum limit at {}"
-            .format(comments_count))
+            " off minumum limit at {}".format(comments_count)
+        )
         return False, disapproval_reason
 
     if len(mand_words) != 0:
@@ -155,15 +161,16 @@ def verify_commenting(browser, max, min, mand_words, logger):
         except Exception:
             first_comment = None
 
-        if ((post_desc is not None and not any(mand_word.lower() in
-                                               post_desc for mand_word in
-                                               mand_words)) or
-                (first_comment is not None and not any(
-                    mand_word.lower() in first_comment for
-                    mand_word in mand_words))):
-            return False, 'mandantory words not in post desc'
+        if (
+            post_desc is not None
+            and not any(mand_word.lower() in post_desc for mand_word in mand_words)
+        ) or (
+            first_comment is not None
+            and not any(mand_word.lower() in first_comment for mand_word in mand_words)
+        ):
+            return False, "mandantory words not in post desc"
 
-    return True, 'Approval'
+    return True, "Approval"
 
 
 def is_commenting_enabled(browser, logger):
@@ -172,7 +179,8 @@ def is_commenting_enabled(browser, logger):
     try:
         comments_disabled = browser.execute_script(
             "return window._sharedData.entry_data."
-            "PostPage[0].graphql.shortcode_media.comments_disabled")
+            "PostPage[0].graphql.shortcode_media.comments_disabled"
+        )
 
     except WebDriverException:
         try:
@@ -181,11 +189,13 @@ def is_commenting_enabled(browser, logger):
 
             comments_disabled = browser.execute_script(
                 "return window._sharedData.entry_data."
-                "PostPage[0].graphql.shortcode_media.comments_disabled")
+                "PostPage[0].graphql.shortcode_media.comments_disabled"
+            )
 
         except Exception as e:
-            msg = ("Failed to check comments' status for verification!\n\t{}"
-                   .format(str(e).encode("utf-8")))
+            msg = "Failed to check comments' status for verification!\n\t{}".format(
+                str(e).encode("utf-8")
+            )
             return False, "Failure"
 
     if comments_disabled is True:
@@ -201,11 +211,11 @@ def get_comments_count(browser, logger):
         comments_count = browser.execute_script(
             "return window._sharedData.entry_data."
             "PostPage[0].graphql.shortcode_media."
-            "edge_media_to_comment.count")
+            "edge_media_to_comment.count"
+        )
 
     except Exception as e:
-        msg = ("Failed to get comments' count!\n\t{}"
-               .format(str(e).encode("utf-8")))
+        msg = "Failed to get comments' count!\n\t{}".format(str(e).encode("utf-8"))
         return None, msg
 
     if not comments_count:

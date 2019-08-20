@@ -1,5 +1,6 @@
 from datetime import datetime
 import sqlite3
+
 # import time
 from math import ceil
 import random
@@ -28,8 +29,7 @@ HOME = "/Users/ishandutta2007"
 CWD = HOME + "/Documents/Projects/FacebookPy"
 
 
-def verify_username_by_id(browser, username, person,
-                          person_id, logger, logfolder):
+def verify_username_by_id(browser, username, person, person_id, logger, logfolder):
     """ Check if the given user has changed username after the time of
     followed """
     # try to find the user by ID
@@ -39,57 +39,50 @@ def verify_username_by_id(browser, username, person,
     if person_id and person_id not in [None, "unknown", "undefined"]:
         # get the [new] username of the user from the stored user ID
         person_new = get_username_from_id(
-            browser, "https://www.facebook.com", person_id, logger)
+            browser, "https://www.facebook.com", person_id, logger
+        )
         if person_new:
             if person_new != person:
                 logger.info(
-                    "User '{}' has changed username and now is called '{}' :S"
-                    .format(person, person_new))
+                    "User '{}' has changed username and now is called '{}' :S".format(
+                        person, person_new
+                    )
+                )
             return person_new
 
         else:
-            logger.info(
-                "The user with the ID of '{}' is unreachable".format(person))
+            logger.info("The user with the ID of '{}' is unreachable".format(person))
 
     else:
-        logger.info(
-            "The user ID of '{}' doesn't exist in local records".format(
-                person))
+        logger.info("The user ID of '{}' doesn't exist in local records".format(person))
 
     return None
 
 
-def get_friending_status(browser, track, username, person, person_id, logger,
-                         logfolder):
+def get_friending_status(
+    browser, track, username, person, person_id, logger, logfolder
+):
     """ Verify if you are friending the user in the loaded page """
     if track == "profile":
         ig_homepage = "https://www.facebook.com/"
         web_address_navigator(browser, ig_homepage + person, logger, Settings)
 
-    friend_button_XP = (
-        "//div[@id='fbTimelineHeadline']/div/div/div/div/button[@type='button'][text()='Add Friend']")
+    friend_button_XP = "//div[@id='fbTimelineHeadline']/div/div/div/div/button[@type='button'][text()='Add Friend']"
     failure_msg = "--> Unable to detect the friending status of '{}'!"
     user_inaccessible_msg = (
         "Couldn't access the profile page of '{}'!\t~might have changed the"
-        " username".format(person))
+        " username".format(person)
+    )
 
     # check if the page is available
     valid_page = is_page_available(browser, logger, Settings)
     if not valid_page:
         logger.warning(user_inaccessible_msg)
-        person_new = verify_username_by_id(browser,
-                                           username,
-                                           person,
-                                           None,
-                                           logger,
-                                           logfolder)
+        person_new = verify_username_by_id(
+            browser, username, person, None, logger, logfolder
+        )
         if person_new:
-            web_address_navigator(
-                browser,
-                ig_homepage +
-                person_new,
-                logger,
-                Settings)
+            web_address_navigator(browser, ig_homepage + person_new, logger, Settings)
             valid_page = is_page_available(browser, logger, Settings)
             if not valid_page:
                 logger.error(failure_msg.format(person_new.encode("utf-8")))
@@ -100,15 +93,16 @@ def get_friending_status(browser, track, username, person, person_id, logger,
             return "UNAVAILABLE", None
 
     # wait until the friend button is located and visible, then get it
-    friend_button = explicit_wait(browser, "VOEL", [friend_button_XP, "XPath"],
-                                  logger, 7, False)
+    friend_button = explicit_wait(
+        browser, "VOEL", [friend_button_XP, "XPath"], logger, 7, False
+    )
     if not friend_button:
         browser.execute_script("location.reload()")
         update_activity(Settings)
 
-        friend_button = explicit_wait(browser, "VOEL",
-                                      [friend_button_XP, "XPath"], logger, 14,
-                                      False)
+        friend_button = explicit_wait(
+            browser, "VOEL", [friend_button_XP, "XPath"], logger, 14, False
+        )
         if not friend_button:
             # cannot find the any of the expected buttons
             logger.error(failure_msg.format(person.encode("utf-8")))
@@ -120,8 +114,9 @@ def get_friending_status(browser, track, username, person, person_id, logger,
     return friending_status, friend_button
 
 
-def friend_user(browser, track, login, userid_to_friend, times, blacklist,
-                logger, logfolder):
+def friend_user(
+    browser, track, login, userid_to_friend, times, blacklist, logger, logfolder
+):
     """ Friend a user either from the profile page or post page or dialog
     box """
     # list of available tracks to friend in: ["profile", "post" "dialog"]
@@ -140,94 +135,105 @@ def friend_user(browser, track, login, userid_to_friend, times, blacklist,
     web_address_navigator(browser, user_link, logger, Settings)
 
     # find out CURRENT friending status
-    friending_status, friend_button = get_friending_status(browser,
-                                                           track,
-                                                           login,
-                                                           userid_to_friend,
-                                                           None,
-                                                           logger,
-                                                           logfolder)
+    friending_status, friend_button = get_friending_status(
+        browser, track, login, userid_to_friend, None, logger, logfolder
+    )
     logger.info(friending_status)
     if friending_status in ["Add Friend"]:
         click_visibly(browser, Settings, friend_button)  # click to friend
-        friend_state, msg = verify_action(browser, "friend", track, login,
-                                          userid_to_friend, None, logger,
-                                          logfolder)
+        friend_state, msg = verify_action(
+            browser, "friend", track, login, userid_to_friend, None, logger, logfolder
+        )
         if friend_state is not True:
             return False, msg
     elif friending_status is None:
         # TODO:BUG:2nd login has to be fixed with userid of loggedin user
         sirens_wailing, emergency_state = emergency_exit(
-            browser, Settings, "https://facebook.com", login, login, logger, logfolder)
+            browser, Settings, "https://facebook.com", login, login, logger, logfolder
+        )
         if sirens_wailing is True:
             return False, emergency_state
 
         else:
             logger.warning(
                 "--> Add Friend button not present '{}'!\t~unexpected failure".format(
-                    userid_to_friend))
+                    userid_to_friend
+                )
+            )
             return False, "unexpected failure"
 
     # general tasks after a successful friend
     logger.info("--> Friended '{}'!".format(userid_to_friend.encode("utf-8")))
-    update_activity(Settings, 'friendeds')
+    update_activity(Settings, "friendeds")
 
-    logtime = datetime.now().strftime('%Y-%m-%d %H:%M')
-    log_friended_pool(login, userid_to_friend, logger,
-                      logfolder, logtime, userid_to_friend)
+    logtime = datetime.now().strftime("%Y-%m-%d %H:%M")
+    log_friended_pool(
+        login, userid_to_friend, logger, logfolder, logtime, userid_to_friend
+    )
 
     friend_restriction("write", userid_to_friend, None, logger)
 
     return True, "success"
 
 
-def unfriend_user(browser, track, login, userid_to_unfriend,
-                  button, blacklist, logger, logfolder, sleep_delay):
+def unfriend_user(
+    browser,
+    track,
+    login,
+    userid_to_unfriend,
+    button,
+    blacklist,
+    logger,
+    logfolder,
+    sleep_delay,
+):
     """ UnFriend a user either from the profile page or post page or dialog
     box """
     user_link = "https://www.facebook.com/{}/".format(userid_to_unfriend)
     web_address_navigator(browser, user_link, logger, Settings)
-    delay_random = random.randint(
-        ceil(sleep_delay * 0.85),
-        ceil(sleep_delay * 1.14))
+    delay_random = random.randint(ceil(sleep_delay * 0.85), ceil(sleep_delay * 1.14))
     try:
         friend_button_elem = browser.find_element_by_css_selector(
-            "div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
+            "div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span"
+        )
         ActionChains(browser).move_to_element(friend_button_elem).perform()
         ActionChains(browser).click().perform()
         sleep(delay_random)
 
         unfriend_button = browser.find_element_by_xpath(
-            "//*[contains(text(), 'Unfriend')]")
+            "//*[contains(text(), 'Unfriend')]"
+        )
         unfriend_button.click()
         logger.info(
-            "---> {} has been successfully unfriended".format(userid_to_unfriend))
+            "---> {} has been successfully unfriended".format(userid_to_unfriend)
+        )
         sleep(delay_random)
         return True, "success"
     except Exception as e:
         logger.error(
-            "Failed to unfriend {}, with error {}".format(
-                userid_to_unfriend, e))
+            "Failed to unfriend {}, with error {}".format(userid_to_unfriend, e)
+        )
         return False, ""
 
 
-def unfriend_user_by_url(browser, track, login, url,
-                         button, blacklist, logger, logfolder, sleep_delay):
+def unfriend_user_by_url(
+    browser, track, login, url, button, blacklist, logger, logfolder, sleep_delay
+):
     """ UnFriend a user either from the profile page or post page or dialog
     box """
     web_address_navigator(browser, url, logger, Settings)
-    delay_random = random.randint(
-        ceil(sleep_delay * 0.85),
-        ceil(sleep_delay * 1.14))
+    delay_random = random.randint(ceil(sleep_delay * 0.85), ceil(sleep_delay * 1.14))
     try:
         friend_button_elem = browser.find_element_by_css_selector(
-            "div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span")
+            "div#pagelet_timeline_profile_actions > div.FriendButton > a > span > span"
+        )
         ActionChains(browser).move_to_element(friend_button_elem).perform()
         ActionChains(browser).click().perform()
         sleep(delay_random * 2)
 
         unfriend_button = browser.find_element_by_xpath(
-            "//*[contains(text(), 'Unfriend')]")
+            "//*[contains(text(), 'Unfriend')]"
+        )
         unfriend_button.click()
         logger.info("---> {} has been successfully unfriended".format(url))
         sleep(delay_random)
@@ -253,7 +259,8 @@ def friend_restriction(operation, username, limit, logger):
             cur.execute(
                 "SELECT * FROM friendRestriction WHERE profile_id=:id_var "
                 "AND username=:name_var",
-                {"id_var": id, "name_var": username})
+                {"id_var": id, "name_var": username},
+            )
             data = cur.fetchone()
             friend_data = dict(data) if data else None
 
@@ -263,12 +270,15 @@ def friend_restriction(operation, username, limit, logger):
                     cur.execute(
                         "INSERT INTO friendRestriction (profile_id, "
                         "username, times) VALUES (?, ?, ?)",
-                        (id, username, 1))
+                        (id, username, 1),
+                    )
                 else:
                     # update the existing record
                     friend_data["times"] += 1
-                    sql = "UPDATE friendRestriction set times = ? WHERE " \
-                          "profile_id=? AND username = ?"
+                    sql = (
+                        "UPDATE friendRestriction set times = ? WHERE "
+                        "profile_id=? AND username = ?"
+                    )
                     cur.execute(sql, (friend_data["times"], id, username))
 
                 # commit the latest changes
@@ -282,16 +292,20 @@ def friend_restriction(operation, username, limit, logger):
                     return False
 
                 else:
-                    exceed_msg = "" if friend_data[
-                        "times"] == limit else "more than "
-                    logger.info("---> {} has already been friended {}{} times"
-                                .format(username, exceed_msg, str(limit)))
+                    exceed_msg = "" if friend_data["times"] == limit else "more than "
+                    logger.info(
+                        "---> {} has already been friended {}{} times".format(
+                            username, exceed_msg, str(limit)
+                        )
+                    )
                     return True
 
     except Exception as exc:
         logger.error(
             "Dap! Error occurred with friend Restriction:\n\t{}".format(
-                str(exc).encode("utf-8")))
+                str(exc).encode("utf-8")
+            )
+        )
 
     finally:
         if conn:
@@ -324,36 +338,30 @@ def confirm_unfriend(browser):
                 sleep(1)
 
 
-def get_following_status(browser, track, username, person, person_id, logger,
-                         logfolder):
+def get_following_status(
+    browser, track, username, person, person_id, logger, logfolder
+):
     """ Verify if you are following the user in the loaded page """
     if track == "profile":
         ig_homepage = "https://www.facebook.com/"
         web_address_navigator(browser, ig_homepage + person, logger, Settings)
 
-    follow_button_XP = ("//div/div/a[@role='button'][text()='Follow']")
+    follow_button_XP = "//div/div/a[@role='button'][text()='Follow']"
     failure_msg = "--> Unable to detect the following status of '{}'!"
     user_inaccessible_msg = (
         "Couldn't access the profile page of '{}'!\t~might have changed the"
-        " username".format(person))
+        " username".format(person)
+    )
 
     # check if the page is available
     valid_page = is_page_available(browser, logger, Settings)
     if not valid_page:
         logger.warning(user_inaccessible_msg)
-        person_new = verify_username_by_id(browser,
-                                           username,
-                                           person,
-                                           None,
-                                           logger,
-                                           logfolder)
+        person_new = verify_username_by_id(
+            browser, username, person, None, logger, logfolder
+        )
         if person_new:
-            web_address_navigator(
-                browser,
-                ig_homepage +
-                person_new,
-                logger,
-                Settings)
+            web_address_navigator(browser, ig_homepage + person_new, logger, Settings)
             valid_page = is_page_available(browser, logger, Settings)
             if not valid_page:
                 logger.error(failure_msg.format(person_new.encode("utf-8")))
@@ -364,15 +372,16 @@ def get_following_status(browser, track, username, person, person_id, logger,
             return "UNAVAILABLE", None
 
     # wait until the follow button is located and visible, then get it
-    follow_button = explicit_wait(browser, "VOEL", [follow_button_XP, "XPath"],
-                                  logger, 7, False)
+    follow_button = explicit_wait(
+        browser, "VOEL", [follow_button_XP, "XPath"], logger, 7, False
+    )
     if not follow_button:
         browser.execute_script("location.reload()")
         update_activity(Settings)
 
-        follow_button = explicit_wait(browser, "VOEL",
-                                      [follow_button_XP, "XPath"], logger, 14,
-                                      False)
+        follow_button = explicit_wait(
+            browser, "VOEL", [follow_button_XP, "XPath"], logger, 14, False
+        )
         if not follow_button:
             # cannot find the any of the expected buttons
             logger.error(failure_msg.format(person.encode("utf-8")))
@@ -384,32 +393,27 @@ def get_following_status(browser, track, username, person, person_id, logger,
     return following_status, follow_button
 
 
-def verify_action(browser, action, track, username, person, person_id, logger,
-                  logfolder):
+def verify_action(
+    browser, action, track, username, person, person_id, logger, logfolder
+):
     """ Verify if the action has succeeded """
     # currently supported actions are follow & unfollow
 
     if action in ["follow", "unfollow"]:
         if action == "follow":
-            post_action_text = "//button[text()='Following' or text(" \
-                               ")='Requested']"
+            post_action_text = "//button[text()='Following' or text(" ")='Requested']"
 
         elif action == "unfollow":
-            post_action_text = "//button[text()='Follow' or text()='Follow " \
-                               "Back']"
+            post_action_text = "//button[text()='Follow' or text()='Follow " "Back']"
 
-        button_change = explicit_wait(browser, "VOEL",
-                                      [post_action_text, "XPath"], logger, 7,
-                                      False)
+        button_change = explicit_wait(
+            browser, "VOEL", [post_action_text, "XPath"], logger, 7, False
+        )
         if not button_change:
             reload_webpage(browser, Settings)
-            following_status, follow_button = get_following_status(browser,
-                                                                   track,
-                                                                   username,
-                                                                   person,
-                                                                   person_id,
-                                                                   logger,
-                                                                   logfolder)
+            following_status, follow_button = get_following_status(
+                browser, track, username, person, person_id, logger, logfolder
+            )
             # find action state *.^
             if following_status in ["Following", "Requested"]:
                 action_state = False if action == "unfollow" else True
@@ -423,8 +427,8 @@ def verify_action(browser, action, track, username, person, person_id, logger,
             # handle it!
             if action_state is True:
                 logger.info(
-                    "Last {} is verified after reloading the page!".format(
-                        action))
+                    "Last {} is verified after reloading the page!".format(action)
+                )
 
             elif action_state is False:
                 # try to do the action one more time!
@@ -434,21 +438,23 @@ def verify_action(browser, action, track, username, person, person_id, logger,
                     sleep(4)  # TODO: use explicit wait here
                     confirm_unfriend(browser)
 
-                button_change = explicit_wait(browser, "VOEL",
-                                              [post_action_text, "XPath"],
-                                              logger, 9, False)
+                button_change = explicit_wait(
+                    browser, "VOEL", [post_action_text, "XPath"], logger, 9, False
+                )
                 if not button_change:
-                    logger.warning("Phew! Last {0} is not verified."
-                                   "\t~'{1}' might be temporarily blocked "
-                                   "from {0}ing\n"
-                                   .format(action, username))
+                    logger.warning(
+                        "Phew! Last {0} is not verified."
+                        "\t~'{1}' might be temporarily blocked "
+                        "from {0}ing\n".format(action, username)
+                    )
                     sleep(210)
                     return False, "temporary block"
 
             elif action_state is None:
                 logger.error(
                     "Hey! Last {} is not verified out of an unexpected "
-                    "failure!".format(action))
+                    "failure!".format(action)
+                )
                 return False, "unexpected"
 
     return True, "success"

@@ -26,10 +26,7 @@ def bypass_suspicious_login(browser, bypass_with_mobile, logger):
     try:
         close_button = browser.find_element_by_xpath("[text()='Close']")
 
-        (ActionChains(browser)
-         .move_to_element(close_button)
-         .click()
-         .perform())
+        (ActionChains(browser).move_to_element(close_button).click().perform())
 
         # update server calls
         update_activity(Settings)
@@ -40,12 +37,10 @@ def bypass_suspicious_login(browser, bypass_with_mobile, logger):
     try:
         # click on "This was me" button if challenge page was called
         this_was_me_button = browser.find_element_by_xpath(
-            "//button[@name='choice'][text()='This Was Me']")
+            "//button[@name='choice'][text()='This Was Me']"
+        )
 
-        (ActionChains(browser)
-         .move_to_element(this_was_me_button)
-         .click()
-         .perform())
+        (ActionChains(browser).move_to_element(this_was_me_button).click().perform())
 
         # update server calls
         update_activity(Settings)
@@ -55,73 +50,72 @@ def bypass_suspicious_login(browser, bypass_with_mobile, logger):
         pass
 
     try:
-        choice = browser.find_element_by_xpath(
-            "//label[@for='choice_1']").text
+        choice = browser.find_element_by_xpath("//label[@for='choice_1']").text
 
     except NoSuchElementException:
         try:
-            choice = browser.find_element_by_xpath(
-                "//label[@class='_q0nt5']").text
+            choice = browser.find_element_by_xpath("//label[@class='_q0nt5']").text
 
         except Exception:
             try:
                 choice = browser.find_element_by_xpath(
-                    "//label[@class='_q0nt5 _a7z3k']").text
+                    "//label[@class='_q0nt5 _a7z3k']"
+                ).text
 
             except Exception:
                 logger.info(
-                    "Unable to locate email or phone button, maybe bypass_suspicious_login=True isn't needed anymore.")
+                    "Unable to locate email or phone button, maybe bypass_suspicious_login=True isn't needed anymore."
+                )
                 return False
 
     if bypass_with_mobile:
-        choice = browser.find_element_by_xpath(
-            "//label[@for='choice_0']").text
+        choice = browser.find_element_by_xpath("//label[@for='choice_0']").text
 
-        mobile_button = browser.find_element_by_xpath(
-            "//label[@for='choice_0']")
+        mobile_button = browser.find_element_by_xpath("//label[@for='choice_0']")
 
-        (ActionChains(browser)
-         .move_to_element(mobile_button)
-         .click()
-         .perform())
+        (ActionChains(browser).move_to_element(mobile_button).click().perform())
 
         sleep(5)
 
     send_security_code_button = browser.find_element_by_xpath(
-        "//button[text()='Send Security Code']")
+        "//button[text()='Send Security Code']"
+    )
 
-    (ActionChains(browser)
-     .move_to_element(send_security_code_button)
-     .click()
-     .perform())
+    (ActionChains(browser).move_to_element(send_security_code_button).click().perform())
 
     # update server calls
     update_activity(Settings)
 
-    logger.info('Facebook detected an unusual login attempt')
-    logger.info('A security code was sent to your {}'.format(choice))
-    security_code = input('Type the security code here: ')
+    logger.info("Facebook detected an unusual login attempt")
+    logger.info("A security code was sent to your {}".format(choice))
+    security_code = input("Type the security code here: ")
 
-    security_code_field = browser.find_element_by_xpath((
-        "//input[@id='security_code']"))
+    security_code_field = browser.find_element_by_xpath(
+        ("//input[@id='security_code']")
+    )
 
-    (ActionChains(browser)
-     .move_to_element(security_code_field)
-     .click()
-     .send_keys(security_code)
-     .perform())
+    (
+        ActionChains(browser)
+        .move_to_element(security_code_field)
+        .click()
+        .send_keys(security_code)
+        .perform()
+    )
 
     # update server calls for both 'click' and 'send_keys' actions
     for i in range(2):
         update_activity(Settings)
 
     submit_security_code_button = browser.find_element_by_xpath(
-        "//button[text()='Submit']")
+        "//button[text()='Submit']"
+    )
 
-    (ActionChains(browser)
-     .move_to_element(submit_security_code_button)
-     .click()
-     .perform())
+    (
+        ActionChains(browser)
+        .move_to_element(submit_security_code_button)
+        .click()
+        .perform()
+    )
 
     # update server calls
     update_activity(Settings)
@@ -130,29 +124,35 @@ def bypass_suspicious_login(browser, bypass_with_mobile, logger):
         sleep(5)
         # locate wrong security code message
         wrong_login = browser.find_element_by_xpath(
-            ("//p[text()='Please check the code we sent you and try again.']"))
+            ("//p[text()='Please check the code we sent you and try again.']")
+        )
 
         if wrong_login is not None:
             logger.info(
-                ('Wrong security code! Please check the code Facebook sent you and try again.'))
+                (
+                    "Wrong security code! Please check the code Facebook sent you and try again."
+                )
+            )
 
     except NoSuchElementException:
         # correct security code
         pass
 
 
-def login_user(browser,
-               username,
-               userid,
-               password,
-               logger,
-               logfolder,
-               switch_language=True,
-               bypass_suspicious_attempt=False,
-               bypass_with_mobile=False):
+def login_user(
+    browser,
+    username,
+    userid,
+    password,
+    logger,
+    logfolder,
+    switch_language=True,
+    bypass_suspicious_attempt=False,
+    bypass_with_mobile=False,
+):
     """Logins the user with the given username and password"""
-    assert username, 'Username not provided'
-    assert password, 'Password not provided'
+    assert username, "Username not provided"
+    assert password, "Password not provided"
 
     ig_homepage = "https://www.facebook.com"
     web_address_navigator(browser, ig_homepage, logger, Settings)
@@ -160,8 +160,9 @@ def login_user(browser,
 
     # try to load cookie from username
     try:
-        for cookie in pickle.load(open('{0}{1}_cookie.pkl'
-                                       .format(logfolder, username), 'rb')):
+        for cookie in pickle.load(
+            open("{0}{1}_cookie.pkl".format(logfolder, username), "rb")
+        ):
             browser.add_cookie(cookie)
             cookie_loaded = True
     except (WebDriverException, OSError, IOError):
@@ -174,7 +175,7 @@ def login_user(browser,
     if switch_language:
         links = browser.find_elements_by_xpath('//*[@id="pageFooter"]/ul/li')
         for link in links:
-            if link.get_attribute('title') == "English (UK)":
+            if link.get_attribute("title") == "English (UK)":
                 click_element(browser, Settings, link)
 
     web_address_navigator(browser, ig_homepage, logger, Settings)
@@ -182,16 +183,18 @@ def login_user(browser,
 
     # cookie has been LOADED, so the user SHOULD be logged in
     # check if the user IS logged in
-    login_state = check_authorization(browser,
-                                      Settings,
-                                      "https://www.facebook.com/",
-                                      username,
-                                      userid,
-                                      "activity counts",
-                                      logger,
-                                      logfolder,
-                                      True)
-    logger.info('check_authorization: {}'.format(login_state))
+    login_state = check_authorization(
+        browser,
+        Settings,
+        "https://www.facebook.com/",
+        username,
+        userid,
+        "activity counts",
+        logger,
+        logfolder,
+        True,
+    )
+    logger.info("check_authorization: {}".format(login_state))
     if login_state is True:
         # dismiss_notification_offer(browser, logger)
         return True
@@ -200,7 +203,8 @@ def login_user(browser,
     # so go create a new cookie..
     if cookie_loaded:
         logger.info(
-            "Issue with cookie for user {}. Creating new cookie...".format(username))
+            "Issue with cookie for user {}. Creating new cookie...".format(username)
+        )
 
     # wait until the 'username' input element is located and visible
     input_username_XP = '//*[@id="email"]'
@@ -208,13 +212,15 @@ def login_user(browser,
 
     input_username = browser.find_element_by_xpath(input_username_XP)
 
-    logger.info('moving to input_username')
-    logger.info('entering input_username')
-    (ActionChains(browser)
-     .move_to_element(input_username)
-     .click()
-     .send_keys(username)
-     .perform())
+    logger.info("moving to input_username")
+    logger.info("entering input_username")
+    (
+        ActionChains(browser)
+        .move_to_element(input_username)
+        .click()
+        .send_keys(username)
+        .perform()
+    )
 
     # update server calls for both 'click' and 'send_keys' actions
     for i in range(2):
@@ -228,12 +234,14 @@ def login_user(browser,
     if not isinstance(password, str):
         password = str(password)
 
-    logger.info('entering input_password')
-    (ActionChains(browser)
-     .move_to_element(input_password[0])
-     .click()
-     .send_keys(password)
-     .perform())
+    logger.info("entering input_password")
+    (
+        ActionChains(browser)
+        .move_to_element(input_password[0])
+        .click()
+        .send_keys(password)
+        .perform()
+    )
 
     # update server calls for both 'click' and 'send_keys' actions
     for i in range(2):
@@ -241,13 +249,10 @@ def login_user(browser,
 
     sleep(1)
 
-    logger.info('submitting login_button')
+    logger.info("submitting login_button")
     login_button = browser.find_element_by_xpath('//*[@type="submit"]')
 
-    (ActionChains(browser)
-     .move_to_element(login_button)
-     .click()
-     .perform())
+    (ActionChains(browser).move_to_element(login_button).click().perform())
 
     # update server calls
     update_activity(Settings)
@@ -261,9 +266,11 @@ def login_user(browser,
     nav = browser.find_elements_by_xpath('//div[@role="navigation"]')
     if len(nav) == 2:
         # create cookie for username
-        logger.info('logged in')
-        pickle.dump(browser.get_cookies(), open(
-            '{0}{1}_cookie.pkl'.format(logfolder, username), 'wb'))
+        logger.info("logged in")
+        pickle.dump(
+            browser.get_cookies(),
+            open("{0}{1}_cookie.pkl".format(logfolder, username), "wb"),
+        )
         return True
     else:
         return False

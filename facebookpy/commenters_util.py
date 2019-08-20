@@ -25,15 +25,17 @@ def users_liked(browser, post_url, logger, amount=100):
         sleep(2)
     except NoSuchElementException:
         logger.info(
-            'Could not get information from post: {},  nothing to return'.format(post_url))
+            "Could not get information from post: {},  nothing to return".format(
+                post_url
+            )
+        )
     return post_likers
 
 
 def likers_from_post(browser, logger, Selectors, amount=20):
     """ Get the list of users from the 'Likes' dialog of a photo """
 
-    liked_counter_button = \
-        '//form/div/div/div/div/div/span/span/a[@role="button"]'
+    liked_counter_button = '//form/div/div/div/div/div/span/span/a[@role="button"]'
 
     try:
         liked_this = browser.find_elements_by_xpath(liked_counter_button)
@@ -48,22 +50,24 @@ def likers_from_post(browser, logger, Selectors, amount=20):
         sleep(1)
 
         # get a reference to the 'Likes' dialog box
-        dialog = browser.find_element_by_xpath(
-            Selectors.likes_dialog_body_xpath)
+        dialog = browser.find_element_by_xpath(Selectors.likes_dialog_body_xpath)
 
         # scroll down the page
         previous_len = -1
         browser.execute_script(
-            "arguments[0].scrollTop = arguments[0].scrollHeight", dialog)
+            "arguments[0].scrollTop = arguments[0].scrollHeight", dialog
+        )
         update_activity(Settings)
         sleep(1)
 
         start_time = time.time()
         user_list = []
 
-        while (not user_list
-               or (len(user_list) != previous_len)
-               and (len(user_list) < amount)):
+        while (
+            not user_list
+            or (len(user_list) != previous_len)
+            and (len(user_list) < amount)
+        ):
 
             previous_len = len(user_list)
             scroll_bottom(browser, dialog, 2)
@@ -85,32 +89,28 @@ def likers_from_post(browser, logger, Selectors, amount=20):
 
         logger.info(
             "Got {} likers shuffled randomly whom you can follow:\n{}"
-            "\n".format(
-                len(user_list), user_list))
+            "\n".format(len(user_list), user_list)
+        )
         return user_list
 
     except Exception as exc:
-        logger.Error(
-            "Some problem occured!\n\t{}".format(
-                str(exc).encode("utf-8")))
+        logger.Error("Some problem occured!\n\t{}".format(str(exc).encode("utf-8")))
         return []
 
 
-def get_post_urls_from_profile(browser, userid, logger, links_to_return_amount=1,
-                               randomize=True):
+def get_post_urls_from_profile(
+    browser, userid, logger, links_to_return_amount=1, randomize=True
+):
     try:
         logger.info("Getting likers from user:  {}".format(userid))
         web_address_navigator(
-            browser,
-            'https://www.facebook.com/' +
-            userid +
-            '/',
-            logger,
-            Settings)
+            browser, "https://www.facebook.com/" + userid + "/", logger, Settings
+        )
         sleep(1)
 
         posts_a_elems = browser.find_elements_by_xpath(
-            "//div/div/div/div/div/div/div/div/div/div/span/span/a")
+            "//div/div/div/div/div/div/div/div/div/div/span/span/a"
+        )
 
         links = []
         for post_element in posts_a_elems:
@@ -127,10 +127,13 @@ def get_post_urls_from_profile(browser, userid, logger, links_to_return_amount=1
             logger.info("shuffling links")
             random.shuffle(links)
 
-        logger.info("Got {}, returning {} links: {}".format(
-                    len(links), min(links_to_return_amount, len(
-                        links)), links[:links_to_return_amount]
-                    ))
+        logger.info(
+            "Got {}, returning {} links: {}".format(
+                len(links),
+                min(links_to_return_amount, len(links)),
+                links[:links_to_return_amount],
+            )
+        )
         sleep(1)
         return links[:links_to_return_amount]
     except Exception as e:

@@ -2,6 +2,7 @@
 
 from setuptools import setup
 from os import path
+
 # io.open is needed for projects that support Python 2.7
 # It ensures open() defaults to text mode with universal newlines,
 # and accepts an argument to specify the text encoding
@@ -25,8 +26,8 @@ with open("requirements.txt") as f:
 
 documentation = readall("README.md")
 metadata = dict(
-    re.findall(
-        r"""__([a-z]+)__ = "([^"]+)""", readall("facebookpy", "__init__.py")))
+    re.findall(r"""__([a-z]+)__ = "([^"]+)""", readall("facebookpy", "__init__.py"))
+)
 
 setup(
     name="facebookpy",
@@ -34,7 +35,7 @@ setup(
     description=summary,
     long_description=documentation,
     long_description_content_type="text/markdown",
-    author=u"Ishan",
+    author="Ishan",
     author_email="ishandutta2007@gmail.com",
     maintainer="FacebookPy Community at Github",
     license="GPLv3",
@@ -46,57 +47,49 @@ setup(
         "Bug Reports": (project_homepage + "/issues"),
         "Funding": "https://www.paypal.me/supportFacebookPy",
         "Say Thanks!": "http://saythanks.io/to/uluQulu",
-        "Source": (project_homepage + "/tree/master/facebookpy")
+        "Source": (project_homepage + "/tree/master/facebookpy"),
     },
     packages=["facebookpy"],
     # include_package_data=True,  # <- packs every data file in the package
-    package_data={   # we need only the files below:
-        "facebookpy": ["icons/Windows/*.ico",
-                       "icons/Linux/*.png",
-                       "icons/Mac/*.icns"]
+    package_data={  # we need only the files below:
+        "facebookpy": ["icons/Windows/*.ico", "icons/Linux/*.png", "icons/Mac/*.icns"]
     },
     keywords=(
         "facebookpy python facebook automation \
          marketing promotion bot selenium"
     ),
-    classifiers=["Development Status :: 4 - Beta",
-                 "Environment :: Console",
-                 "Environment :: Win32 (MS Windows)",
-                 "Environment :: MacOS X",
-                 "Environment :: Web Environment",
-                 "Intended Audience :: End Users/Desktop",
-                 "Intended Audience :: Developers",
-                 "Operating System :: Microsoft :: Windows",
-                 "Operating System :: POSIX :: Linux",
-                 "Operating System :: MacOS :: MacOS X",
-                 "Operating System :: Unix",
-                 "Programming Language :: Python",
-                 "Programming Language :: JavaScript",
-                 "Programming Language :: SQL",
-                 "Topic :: Utilities",
-                 "Topic :: Software Development :: Build Tools",
-                 "Programming Language :: Python :: 2",
-                 "Programming Language :: Python :: 2.7",
-                 "Programming Language :: Python :: 3",
-                 "Programming Language :: Python :: 3.4",
-                 "Programming Language :: Python :: 3.5",
-                 "Programming Language :: Python :: 3.6",
-                 "Programming Language :: Python :: 3.7",
-                 "Natural Language :: English"
-                 ],
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Environment :: Console",
+        "Environment :: Win32 (MS Windows)",
+        "Environment :: MacOS X",
+        "Environment :: Web Environment",
+        "Intended Audience :: End Users/Desktop",
+        "Intended Audience :: Developers",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: Unix",
+        "Programming Language :: Python",
+        "Programming Language :: JavaScript",
+        "Programming Language :: SQL",
+        "Topic :: Utilities",
+        "Topic :: Software Development :: Build Tools",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Natural Language :: English",
+    ],
     install_requires=dependencies,
     extras_require={
-        "test": ["pytest >= 3.0.0",
-                 "tox",
-                 "flake8",
-                 "virtualenv",
-                 "tox-venv"
-                 ]
+        "test": ["pytest >= 3.0.0", "tox", "flake8", "virtualenv", "tox-venv"]
     },
     python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
     platforms=["win32", "linux", "linux2", "darwin"],
     zip_safe=False,
-    entry_points={
-        "console_scripts": []
-    }
+    entry_points={"console_scripts": []},
 )

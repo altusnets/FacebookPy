@@ -11,5 +11,4 @@ class Selectors:
     Store XPath, CSS, and other element selectors to be used at many places
     """
 
-    likes_dialog_body_xpath = \
-        ('//*[@id="facebook"]/body/div[10]/div[2][@role="dialog"]')
+    likes_dialog_body_xpath = '//*[@id="facebook"]/body/div[10]/div[2][@role="dialog"]'
